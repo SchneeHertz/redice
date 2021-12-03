@@ -1,0 +1,49 @@
+[
+  {
+    "id": 1,
+    "event": "重冰",
+    "description": "水结冰时体积变小",
+    "rare": 3,
+    "remove": "e5",
+    "scope": 1,
+    "init": 1
+  },
+  {
+    "id": 2,
+    "event": "难得素",
+    "description": "诱发远距黑洞辐射的元素",
+    "rare": 3,
+    "scope": 1,
+    "init": 1
+  },
+  {
+    "id": 3,
+    "event": "大氧化事件",
+    "description": "氧气，自由之火，自由之毒",
+    "rare": 1,
+    "base": "m6",
+    "scope": 1
+  },
+  {
+    "id": 4,
+    "event": "卡尼期洪积事件",
+    "description": "一场整整下了两百万年的雨",
+    "rare": 2,
+    "scope": 1
+  },
+  {
+    "id": 5,
+    "event": "雪球地球",
+    "description": "地表完全被冰层覆盖",
+    "rare": 2,
+    "remove": "e1",
+    "scope": 1
+  },
+  {
+    "id": 6,
+    "event": "小陨石",
+    "description": "来自编号298的一颗小小的天外来客",
+    "rare": 1,
+    "scope": 1
+  }
+]
