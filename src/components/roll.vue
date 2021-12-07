@@ -1,10 +1,10 @@
 <template>
   <div>
     <transition :name="fadeType">
-      <img :src="eventImage1st" v-if="trigger" key="on" class="event-icon" @click="log('1st')"/>
-      <img :src="eventImage2nd" v-else key="off" class="event-icon" @click="log('2nd')" />
+      <img :src="eventImage1st" v-if="trigger" key="on" class="event-icon" @click="log('1st')" :style="{margin: iconMargin}"/>
+      <img :src="eventImage2nd" v-else key="off" class="event-icon" @click="log('2nd')" :style="{margin: iconMargin}"/>
     </transition>
-    <img :src="imageBlock" class="event-icon-block" />
+    <img :src="imageBlock" class="event-icon-block" :style="{margin: iconMargin}"/>
   </div>
 </template>
 
@@ -14,7 +14,11 @@ export default {
     eventNow: String,
     eventAfter: String,
     event_icons: Array,
-    pathString: String
+    pathString: String,
+    iconMargin: {
+      type: String,
+      default: '4px'
+    }
   },
   data () {
     return {
@@ -63,12 +67,12 @@ export default {
 
 <style lang="stylus" scoped>
 .event-icon
-  margin: 4px
+  // margin: 4px
   position absolute
   z-index 2
 
 .event-icon-block
-  margin: 4px
+  // margin: 4px
   opacity: 0
 
 .fast-fade-leave-active, .fast-fade-enter-active

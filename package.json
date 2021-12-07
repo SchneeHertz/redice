@@ -1,13 +1,13 @@
 {
   "name": "rd",
   "version": "0.1.0",
-  "type": "module",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build"
   },
   "dependencies": {
+    "@antv/g6": "^4.5.0",
     "core-js": "^3.6.5",
     "element-ui": "^2.15.6",
     "lodash": "^4.17.21",

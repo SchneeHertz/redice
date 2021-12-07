@@ -4,7 +4,24 @@
     "mutation": "胞吞共生",
     "cat": "组织",
     "description": "虽然动机并不单纯，但结果似乎没人反对",
-    "rare": 1
+    "rare": 1,
+    "graph": [
+      {
+        "icon": "bge",
+        "x": 1,
+        "y": 1
+      },
+      {
+        "icon": "bgch",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "icon": "bgoz",
+        "x": 2,
+        "y": 1
+      }
+    ]
   },
   {
     "id": 2,

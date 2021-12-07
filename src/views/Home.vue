@@ -1,47 +1,49 @@
 <template>
   <div class="home">
-    <h1>演化模拟器</h1>
+    <h1>异世界转生模拟器</h1>
     <el-card id="content">
       <el-row :gutter="10" id="card-row">
-        <el-col :lg="9" :sm="24">
-          <el-card id="mutation-card">
+        <el-col :lg="8" :sm="24">
+          <el-card id="action-card">
             <template #header>
-              <span>进化</span>
-              <el-switch v-model="mutationSwitch" class="mutation-switch" :disabled="disableMutationSwitch"/>
+              <span>扭蛋</span>
+              <el-switch v-model="actionSwitch" class="action-switch" :disabled="disableActionSwitch"/>
             </template>
             <el-row class="icon-warp">
-              <el-col :span="6" v-for="mutation in mutationShowList1" :key="mutation.key">
+              <el-col :span="6" v-for="action in actionShowList1" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
                   <Roll 
                     eventNow ="empty.png"
-                    :event_icons="mutation_icons"
-                    :eventAfter="mutation.icon"
-                    pathString="img/mutation_icons/"
-                    ref="mutation"
-                    v-if="mutation.show"
+                    :event_icons="action_icons"
+                    :eventAfter="action.icon"
+                    pathString="img/action_icons/"
+                    ref="action"
+                    v-if="action.show"
+                    iconMargin="2px"
                   />
-                  <img :src="`img/mutation_icons/+${mutation.value}.png`" class="mutation-score" v-else/>
+                  <img :src="`img/action_icons/+${action.value}.png`" class="action-score" v-else/>
                 </transition>
               </el-col>
             </el-row>
             <el-row class="icon-warp">
-              <el-col :span="6" v-for="mutation in mutationShowList2" :key="mutation.key">
+              <el-col :span="6" v-for="action in actionShowList2" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
                   <Roll 
                     eventNow ="empty.png"
-                    :event_icons="mutation_icons"
-                    :eventAfter="mutation.icon"
-                    pathString="img/mutation_icons/"
-                    ref="mutation"
-                    v-if="mutation.show"
+                    :event_icons="action_icons"
+                    :eventAfter="action.icon"
+                    pathString="img/action_icons/"
+                    ref="action"
+                    v-if="action.show"
+                    iconMargin="2px"
                   />
-                  <img :src="`img/mutation_icons/+${mutation.value}.png`" class="mutation-score" v-else/>
+                  <img :src="`img/action_icons/+${action.value}.png`" class="action-score" v-else/>
                 </transition>
               </el-col>
             </el-row>
           </el-card>
         </el-col>
-        <el-col :lg="9" :sm="24">
+        <el-col :lg="7" :sm="24">
           <el-card id="event-card">
             <template #header>
               <span>事件</span>
@@ -55,6 +57,7 @@
                   :eventAfter="eventShow.icon"
                   pathString="img/event_icons/"
                   ref="eventroll"
+                  iconMargin="10px"
                 />
               </el-col>
               <el-col :span="8">
@@ -64,6 +67,7 @@
                   :eventAfter="`bn${eventShow.value}.png`"
                   pathString="img/number_icons/"
                   ref="eventrollvalue"
+                  iconMargin="10px"
                 />
                 <!-- <img :src="`img/number_icons/bn${eventShow.value}.png`" class="event-value"/> -->
               </el-col>
@@ -74,12 +78,13 @@
                   :eventAfter="`bn${eventRolled}.png`"
                   pathString="img/number_icons/"
                   ref="eventresultroll"
+                  iconMargin="10px"
                 />
               </el-col>
             </el-row>
           </el-card>
         </el-col>
-        <el-col :lg="6" :sm="24">
+        <el-col :lg="9" :sm="24">
           <el-card id="logger-card">
             <template #header>
               <span>记录</span>
@@ -87,18 +92,32 @@
             
           </el-card>
         </el-col>
-        <el-col :lg="24" :sm="24">
+        <el-col :lg="12" :sm="24">
           <el-card id="status-card">
             <template #header>
-              <span>状态</span>
+              <span>事件</span>
             </template>
-            <el-descriptions class="margin-top"  :column="3" size="small">
-              <el-descriptions-item v-for="(value, key) in status" :key="key" :label="key">{{value}}</el-descriptions-item>
-            </el-descriptions>
+            <el-tabs
+              id="skill-card"
+              type="border-card"
+              tabPosition="left"
+            >
+              <el-tab-pane label="消息中心"><div style="height:400px;width:400px;background-color:lightblue;"></div></el-tab-pane>
+              <el-tab-pane label="消息中心">消息中心</el-tab-pane>
+              <el-tab-pane label="角色管理">角色管理</el-tab-pane>
+              <el-tab-pane label="定时任务补偿">定时任务补偿</el-tab-pane>
+            </el-tabs>
+          </el-card>
+        </el-col>
+        <el-col :lg="12" :sm="24">
+          <el-card id="story-card">
+            <template #header>
+              <span>故事</span>
+            </template>
           </el-card>
         </el-col>
       </el-row>
-      <div class="timer">地球时间 {{formatTime(timer)}} 年</div>
+      <!-- <div class="timer">时间 {{formatTime(timer)}} 天</div> -->
     </el-card>
   </div>
 </template>
@@ -106,9 +125,9 @@
 <script>
 // @ is an alias to /src
 import event_icons from '@/assets/event_icons.json'
-import mutation_icons from '@/assets/mutation_icons.json'
+import action_icons from '@/assets/action_icons.json'
 import number_icons from '@/assets/number_icons.json'
-import mutationList from '@/assets/mutationList.json'
+import actionList from '@/assets/actionList.json'
 import eventList from '@/assets/eventList.json'
 import _ from 'lodash'
 import Roll from '@/components/roll.vue'
@@ -124,12 +143,13 @@ export default {
       framerate: 60,
       letters:['a', 'ch', 'd', 'e', 'f', 'g', 'ie', 'ii', 'iu', 'k', 'l', 'm', 'n', 'oo', 'oz', 'p', 'ps', 'r', 's', 't', 'th', 'v', 'x', 'z'],
       number_icons: number_icons,
-      mutationList: mutationList,
-      mutation_icons: mutation_icons,
-      mutationSwitch: false,
-      disableMutationSwitch: false,
-      existMutationList: [],
-      mutationShowList: [
+      actionList: actionList,
+      availableActionList: [],
+      action_icons: action_icons,
+      actionSwitch: false,
+      disableActionSwitch: false,
+      existActionList: [],
+      actionShowList: [
         {icon: 'bgv.png', show: true, key: 0.1, value: 10},
         {icon: 'cgm.png', show: true, key: 0.2, value: 10},
         {icon: 'bgn.png', show: true, key: 0.3, value: 10},
@@ -148,8 +168,8 @@ export default {
       },
       eventRolled: 0,
       status: {
-        mutationPoint: 11400,
-        mutationRate: 1,
+        actionPoint: 11400,
+        actionRate: 1,
         eventPoint: 0,
         biomass: 100,
         reproductiverate: 0.1,
@@ -161,20 +181,20 @@ export default {
     }
   },
   computed: {
-    mutationShowList1 () {
-      return this.mutationShowList.slice(0, 4)
+    actionShowList1 () {
+      return this.actionShowList.slice(0, 4)
     },
-    mutationShowList2 () {
-      return this.mutationShowList.slice(4, 8)
+    actionShowList2 () {
+      return this.actionShowList.slice(4, 8)
     },
   },
   watch: {
     status: {
       handler: function (val, oldVal) {
-        if (val.mutationPoint >= 12000 && !this.mutationSwitch) {
-          this.mutationSwitch = true
-          this.$set(val, 'mutationPoint', val.mutationPoint - 1200)
-          this.mutationShowList = _.fill(Array(8), 0).map(()=>({
+        if (val.actionPoint >= 12000 && !this.actionSwitch) {
+          this.actionSwitch = true
+          this.$set(val, 'actionPoint', val.actionPoint - 1200)
+          this.actionShowList = _.fill(Array(8), 0).map(()=>({
             show: true,
             key: _.random(0, 99999),
             ...this.pickIcon()
@@ -182,14 +202,14 @@ export default {
           for (let i=0; i<8; i++) {
             if (i !== 7) {
               setTimeout(()=>{
-                this.$refs.mutation[i].roundEvent()
+                this.$refs.action[i].roundEvent()
               }, 250*i)
             } else {
               setTimeout(()=>{
-                this.$refs.mutation[i].roundEvent()
+                this.$refs.action[i].roundEvent()
                 setTimeout(()=>{
-                  this.convertMutationPoint()
-                  setTimeout(()=>{this.mutationSwitch = false}, 1000)
+                  this.convertActionPoint()
+                  setTimeout(()=>{this.actionSwitch = false}, 1000)
                 }, 5000)
               }, 250*i)
             }            
@@ -223,9 +243,6 @@ export default {
     this.timeFlow()
   },
   methods: {
-    calculateBiomass () {
-      this.$set(this.status, 'biomass', this.status.biomass * (1+this.status.reproductiverate))
-    },
     pickIcon () {
       let seed = _.random(1,100)
       let color, type, letter, value
@@ -248,13 +265,13 @@ export default {
         value: value
       }
     },
-    convertMutationPoint () {
-      _.forIn(this.mutationShowList, mutation=>{
-        if (this.existMutationList.includes(mutation.icon)) {
-          this.$set(mutation, 'show', false)
-          this.$set(this.status, 'mutationPoint', this.status.mutationPoint+mutation.value)
+    convertActionPoint () {
+      _.forIn(this.actionShowList, action=>{
+        if (this.existActionList.includes(action.icon)) {
+          this.$set(action, 'show', false)
+          this.$set(this.status, 'actionPoint', this.status.actionPoint+action.value)
         } else {
-          this.existMutationList.push(mutation.icon)
+          this.existActionList.push(action.icon)
         }
         this.$set(this.status, 'eventPoint', this.status.eventPoint + 50)
       })
@@ -282,8 +299,8 @@ export default {
       let tick = () => {
         if (++count % this.framerate == 0) {
           this.timer += 60
-          this.$set(this.status, 'mutationPoint', this.status.mutationPoint + 100)
-          this.calculateBiomass()
+          this.$set(this.status, 'actionPoint', this.status.actionPoint + 100)
+          // this.calculateBiomass()
         }
         requestAnimationFrame(tick)
       }
@@ -301,19 +318,21 @@ export default {
   .el-card
     text-align left
     margin-bottom 10px
-  #mutation-card, #event-card, #logger-card
-    height 334px
-  #status-card
-    height 240px
-  .event-switch, .mutation-switch
+  #action-card, #event-card, #logger-card
+    height 284px
+  #status-card, #story-card
+    height 500px
+  #skill-card
+    height 435px
+  .event-switch, .action-switch
     float right 
   .event-value
     margin 4px
   .icon-warp
-    margin 8px 0
+    margin 4px 0
     overflow hidden
-  .mutation-score
-    margin 4px
+  .action-score
+    margin 2px
 
   .fast-fade-leave-active, .fast-fade-enter-active
     transition all 0.1s
@@ -323,4 +342,14 @@ export default {
     transform translateY(-128px)
   .fast-fade-enter, .fast-fade-leave-active
     opacity 0.2
+</style>
+
+<style lang="stylus">
+#content
+  .el-card__body
+    padding 10px
+  .el-card__header
+    padding 10px 20px
+  .el-tabs__header.is-left
+    width 148px
 </style>

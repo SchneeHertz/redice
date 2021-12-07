@@ -1,6 +1,6 @@
-import path from 'path'
-import fs from 'fs/promises'
-import XLSX from 'xlsx'
+const path = requrie('path')
+const fs = require('fs/promises')
+const XLSX = require('xlsx')
 
 // ;(async ()=>{
 //   for (let folder of await fs.readdir('./assets', {withFileTypes: true})) {
