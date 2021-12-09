@@ -1,0 +1,56 @@
+[
+  {
+    "id": "GbhgHBbgh",
+    "name": "铁剑",
+    "cat": "武器",
+    "description": "一把铁制的短剑",
+    "rare": 1,
+    "nodes": [
+      {
+        "id": "bge11",
+        "icon": "bge.png",
+        "x": 1,
+        "y": 1
+      },
+      {
+        "id": "bgch12",
+        "icon": "bgch.png",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "id": "bgoz21",
+        "icon": "bgoz.png",
+        "x": 2,
+        "y": 1
+      }
+    ]
+  },
+  {
+    "id": "gjhHHghgbu",
+    "name": "转生为史莱姆",
+    "cat": "转生",
+    "description": "史莱姆是一种粘稠的细胞集合体",
+    "rare": 1,
+    "nodes": [
+      {
+        "id": "rbgs11",
+        "icon": "rbgs.png",
+        "x": 1,
+        "y": 1
+      },
+      {
+        "id": "cgl12",
+        "icon": "cgl.png",
+        "x": 1,
+        "y": 2
+      },
+      {
+        "id": "bgm13",
+        "icon": "bgm.png",
+        "x": 1,
+        "y": 3
+      }
+    ]
+  }
+]

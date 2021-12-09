@@ -12,32 +12,32 @@
             <el-row class="icon-warp">
               <el-col :span="6" v-for="action in actionShowList1" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
-                  <Roll 
-                    eventNow ="empty.png"
+                  <Roll
+                    eventNow ="bemp.png"
                     :event_icons="action_icons"
                     :eventAfter="action.icon"
-                    pathString="img/action_icons/"
+                    pathString="icons/"
                     ref="action"
                     v-if="action.show"
                     iconMargin="2px"
                   />
-                  <img :src="`img/action_icons/+${action.value}.png`" class="action-score" v-else/>
+                  <img :src="`icons/+${action.value}.png`" class="action-score" v-else/>
                 </transition>
               </el-col>
             </el-row>
             <el-row class="icon-warp">
               <el-col :span="6" v-for="action in actionShowList2" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
-                  <Roll 
-                    eventNow ="empty.png"
+                  <Roll
+                    eventNow ="bemp.png"
                     :event_icons="action_icons"
                     :eventAfter="action.icon"
-                    pathString="img/action_icons/"
+                    pathString="icons/"
                     ref="action"
                     v-if="action.show"
                     iconMargin="2px"
                   />
-                  <img :src="`img/action_icons/+${action.value}.png`" class="action-score" v-else/>
+                  <img :src="`icons/+${action.value}.png`" class="action-score" v-else/>
                 </transition>
               </el-col>
             </el-row>
@@ -52,20 +52,20 @@
             <el-row class="icon-warp">
               <el-col :span="8">
                 <Roll
-                  eventNow="empty.png"
+                  eventNow="bemp.png"
                   :event_icons="event_icons"
                   :eventAfter="eventShow.icon"
-                  pathString="img/event_icons/"
+                  pathString="icons/"
                   ref="eventroll"
                   iconMargin="10px"
                 />
               </el-col>
               <el-col :span="8">
                 <Roll
-                  eventNow="empty.png"
+                  eventNow="bemp.png"
                   :event_icons="number_icons"
                   :eventAfter="`bn${eventShow.value}.png`"
-                  pathString="img/number_icons/"
+                  pathString="icons/"
                   ref="eventrollvalue"
                   iconMargin="10px"
                 />
@@ -73,10 +73,10 @@
               </el-col>
               <el-col :span="8">
                 <Roll
-                  eventNow="empty.png"
+                  eventNow="bemp.png"
                   :event_icons="number_icons"
                   :eventAfter="`bn${eventRolled}.png`"
-                  pathString="img/number_icons/"
+                  pathString="icons/"
                   ref="eventresultroll"
                   iconMargin="10px"
                 />
@@ -87,9 +87,12 @@
         <el-col :lg="9" :sm="24">
           <el-card id="logger-card">
             <template #header>
-              <span>记录</span>
+              <span>状态</span>
             </template>
-            
+            <el-descriptions :column="3" size="mini">
+              <el-descriptions-item label="动作点">{{actionPoint}}</el-descriptions-item>
+              <el-descriptions-item label="事件点">{{eventPoint}}</el-descriptions-item>
+            </el-descriptions>
           </el-card>
         </el-col>
         <el-col :lg="12" :sm="24">
@@ -102,10 +105,22 @@
               type="border-card"
               tabPosition="left"
             >
-              <el-tab-pane label="消息中心"><div style="height:400px;width:400px;background-color:lightblue;"></div></el-tab-pane>
-              <el-tab-pane label="消息中心">消息中心</el-tab-pane>
-              <el-tab-pane label="角色管理">角色管理</el-tab-pane>
-              <el-tab-pane label="定时任务补偿">定时任务补偿</el-tab-pane>
+              <el-tab-pane
+                v-for="skill in displaySkillList"
+                :key="skill.name"
+                :label="skill.name"
+              >
+                <Skill
+                  :id="skill.id"
+                  :nodes="skill.nodes"
+                  :activeAction="skill.activeAction"
+                  @choose="chooseSkill(skill.id)"
+                />
+                <div class="button-skill-action">
+                  <el-button type="success" size="mini" icon="el-icon-check" plain round></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round></el-button>
+                </div>
+              </el-tab-pane>
             </el-tabs>
           </el-card>
         </el-col>
@@ -127,28 +142,31 @@
 import event_icons from '@/assets/event_icons.json'
 import action_icons from '@/assets/action_icons.json'
 import number_icons from '@/assets/number_icons.json'
-import actionList from '@/assets/actionList.json'
+import skillList from '@/assets/skillList.json'
 import eventList from '@/assets/eventList.json'
 import _ from 'lodash'
 import Roll from '@/components/roll.vue'
+import Skill from '@/components/skill.vue'
+import { nanoid } from 'nanoid'
 
 export default {
   name: 'Home',
   components: {
-    Roll
+    Roll,
+    Skill
   },
   data () {
     return {
       timer: 0,
       framerate: 60,
       letters:['a', 'ch', 'd', 'e', 'f', 'g', 'ie', 'ii', 'iu', 'k', 'l', 'm', 'n', 'oo', 'oz', 'p', 'ps', 'r', 's', 't', 'th', 'v', 'x', 'z'],
-      number_icons: number_icons,
-      actionList: actionList,
+      number_icons: [],
+      skillList: skillList,
       availableActionList: [],
-      action_icons: action_icons,
+      action_icons: [],
       actionSwitch: false,
       disableActionSwitch: false,
-      existActionList: [],
+      existActionList: ['bge.png'],
       actionShowList: [
         {icon: 'bgv.png', show: true, key: 0.1, value: 10},
         {icon: 'cgm.png', show: true, key: 0.2, value: 10},
@@ -167,17 +185,9 @@ export default {
         value: 9
       },
       eventRolled: 0,
-      status: {
-        actionPoint: 11400,
-        actionRate: 1,
-        eventPoint: 0,
-        biomass: 100,
-        reproductiverate: 0.1,
-        lifetime: 0.00023,
-        intelligence: 1,
-        ecologicalNichePoint: 1,
-        phenotypicTrait: [],
-      }
+      actionPoint: 11400,
+      eventPoint: 0,
+      chosenSkillList: []
     }
   },
   computed: {
@@ -187,72 +197,86 @@ export default {
     actionShowList2 () {
       return this.actionShowList.slice(4, 8)
     },
+    displaySkillList () {
+      return _(_.cloneDeep(this.skillList)).map(s=>{
+        let nodeIcons = s.nodes.map(n=>n.icon)
+        s.activeAction = _.filter(this.existActionList, a=>nodeIcons.includes(a))
+        return s
+      })
+      .filter(s=>{
+        return !(_.isEmpty(s.activeAction) || this.chosenSkillList.includes(s.id))
+      })
+      .sortBy(s=>-s.activeAction.length / s.nodes.length)
+      .value()
+    }
   },
   watch: {
-    status: {
-      handler: function (val, oldVal) {
-        if (val.actionPoint >= 12000 && !this.actionSwitch) {
-          this.actionSwitch = true
-          this.$set(val, 'actionPoint', val.actionPoint - 1200)
-          this.actionShowList = _.fill(Array(8), 0).map(()=>({
-            show: true,
-            key: _.random(0, 99999),
-            ...this.pickIcon()
-          }))
-          for (let i=0; i<8; i++) {
-            if (i !== 7) {
-              setTimeout(()=>{
-                this.$refs.action[i].roundEvent()
-              }, 250*i)
-            } else {
-              setTimeout(()=>{
-                this.$refs.action[i].roundEvent()
-                setTimeout(()=>{
-                  this.convertActionPoint()
-                  setTimeout(()=>{this.actionSwitch = false}, 1000)
-                }, 5000)
-              }, 250*i)
-            }            
-          }
-        }
-        if (val.eventPoint >= 1000 && !this.eventSwitch) {
-          this.eventSwitch = true
-          this.$set(val, 'eventPoint', val.eventPoint - 1000)
-          this.eventShow = {
-            icon: this.pickIcon().icon,
-            value: _.random(0, 9)
-          }
-          setTimeout(()=>{
-            this.$refs.eventroll.roundEvent()
-            this.$refs.eventrollvalue.roundEvent()
-            this.eventRolled = _.random(0, 9)
+    actionPoint: function (val, oldVal) {
+      if (val >= 12000 && !this.actionSwitch) {
+        this.actionSwitch = true
+        this.actionPoint -= 1200
+        this.actionShowList = _.fill(Array(8), 0).map(()=>({
+          show: true,
+          key: _.random(0, 99999),
+          ...this.pickIcon()
+        }))
+        for (let i=0; i<8; i++) {
+          if (i !== 7) {
             setTimeout(()=>{
-              this.$refs.eventresultroll.roundEvent()
+              this.$refs.action[i].roundEvent()
+            }, 250*i)
+          } else {
+            setTimeout(()=>{
+              this.$refs.action[i].roundEvent()
               setTimeout(()=>{
-                this.eventSwitch = false
-              }, 4500)
-            }, 4500)
-          }, 1000)
+                this.convertActionPoint()
+                setTimeout(()=>{this.actionSwitch = false}, 1000)
+              }, 5000)
+            }, 250*i)
+          }
         }
-      },  
-      deep: true
+      }
+    },
+    eventPoint: function (val, oldVal) {
+      if (val >= 1000 && !this.eventSwitch) {
+        this.eventSwitch = true
+        this.eventPoint -= 1000
+        this.eventShow = {
+          icon: this.pickIcon().icon,
+          value: _.random(0, 9)
+        }
+        setTimeout(()=>{
+          this.$refs.eventroll.roundEvent()
+          this.$refs.eventrollvalue.roundEvent()
+          this.eventRolled = _.random(0, 9)
+          setTimeout(()=>{
+            this.$refs.eventresultroll.roundEvent()
+            setTimeout(()=>{
+              this.eventSwitch = false
+            }, 4500)
+          }, 4500)
+        }, 1000)
+      }
     }
   },
   mounted () {
     this.caculateFramerate()
     this.timeFlow()
+    this.action_icons = this.geneList(['b', 'y', 'rb'], ['g'], this.letters)
+    this.number_icons = this.geneList(['b'], ['n'], [0,1,2,3,4,5,6,7,8,9])
+    this.event_icons = this.geneList(['b', 'y', 'rb'], ['g'], this.letters)
   },
   methods: {
     pickIcon () {
       let seed = _.random(1,100)
       let color, type, letter, value
       type = 'g'
-      if (seed > 98) {
+      if (seed > 95) {
         color = 'rb'
         letter = _.sample(this.letters)
         value = 500
-      } else if (seed > 80) {
-        color = 'c'
+      } else if (seed > 70) {
+        color = 'y'
         letter = _.sample(this.letters)
         value = 100
       } else {
@@ -269,12 +293,20 @@ export default {
       _.forIn(this.actionShowList, action=>{
         if (this.existActionList.includes(action.icon)) {
           this.$set(action, 'show', false)
-          this.$set(this.status, 'actionPoint', this.status.actionPoint+action.value)
+          this.actionPoint += action.value
         } else {
           this.existActionList.push(action.icon)
         }
-        this.$set(this.status, 'eventPoint', this.status.eventPoint + 50)
+        this.eventPoint += 50
       })
+    },
+    chooseSkill (id) {
+      let skill = _.find(this.displaySkillList, {id: id})
+      if (skill.activeAction.length == skill.nodes.length) {
+        if (skill.onetime) this.chosenSkillList.push(id)
+        this.existActionList = _.without(this.existActionList, ...skill.activeAction)
+
+      }
     },
     formatTime (timer) {
       return new Intl.NumberFormat().format(timer)
@@ -299,12 +331,23 @@ export default {
       let tick = () => {
         if (++count % this.framerate == 0) {
           this.timer += 60
-          this.$set(this.status, 'actionPoint', this.status.actionPoint + 100)
+          this.actionPoint += 100
           // this.calculateBiomass()
         }
         requestAnimationFrame(tick)
       }
       requestAnimationFrame(tick)
+    },
+    geneList (arrayA, arrayB, arrayC) {
+      let resultList = []
+      _.forIn(arrayA, elementInA=>{
+        _.forIn(arrayB, elementInB=>{
+          _.forIn(arrayC, elementInC=>{
+            resultList.push(elementInA + elementInB + elementInC + '.png')
+          })
+        })
+      })
+      return resultList
     }
   }
 }
@@ -325,7 +368,7 @@ export default {
   #skill-card
     height 435px
   .event-switch, .action-switch
-    float right 
+    float right
   .event-value
     margin 4px
   .icon-warp
@@ -333,6 +376,8 @@ export default {
     overflow hidden
   .action-score
     margin 2px
+  .button-skill-action
+    float right
 
   .fast-fade-leave-active, .fast-fade-enter-active
     transition all 0.1s

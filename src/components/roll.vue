@@ -14,7 +14,10 @@ export default {
     eventNow: String,
     eventAfter: String,
     event_icons: Array,
-    pathString: String,
+    pathString: {
+      type: String,
+      default: 'icons/'
+    },
     iconMargin: {
       type: String,
       default: '4px'
@@ -25,7 +28,7 @@ export default {
       trigger: true,
       eventImage1st: this.pathString + this.eventNow,
       eventImage2nd: this.pathString + this.eventNow,
-      imageBlock: this.pathString + 'empty.png',
+      imageBlock: this.pathString + 'bemp.png',
       fadeType: ''
     }
   },
