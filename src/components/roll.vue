@@ -20,7 +20,7 @@ export default {
     },
     iconMargin: {
       type: String,
-      default: '4px'
+      default: '2px'
     }
   },
   data () {
@@ -35,6 +35,22 @@ export default {
   methods: {
     log (str) {
       console.log(str)
+    },
+    fastRoundEvent () {
+      let count = 0
+      let frameRate = 6
+      let frameCount = 20
+      this.fadeType = 'fast-fade'
+      let imageList = Array(frameCount - 1).fill(0).map(()=>this.pathString + this.event_icons[_.random(0, this.event_icons.length - 1)])
+      imageList.unshift(this.pathString + this.eventAfter)
+      let tick = () => {
+        if (++count % frameRate == 0) {
+          this.trigger = !this.trigger
+          !this.trigger ? this.eventImage2nd = imageList.pop() : this.eventImage1st = imageList.pop()
+        }
+        if (count < 120) requestAnimationFrame(tick)
+      }
+      requestAnimationFrame(tick)
     },
     roundEvent (speed = [6, 18, 54], duration = [90, 180, 240]) {
       let count = 0
@@ -70,12 +86,10 @@ export default {
 
 <style lang="stylus" scoped>
 .event-icon
-  // margin: 4px
   position absolute
   z-index 2
 
 .event-icon-block
-  // margin: 4px
   opacity: 0
 
 .fast-fade-leave-active, .fast-fade-enter-active

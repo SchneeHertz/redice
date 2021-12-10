@@ -7,19 +7,18 @@
           <el-card id="action-card">
             <template #header>
               <span>扭蛋</span>
-              <el-switch v-model="actionSwitch" class="action-switch" :disabled="disableActionSwitch"/>
+              <el-switch v-model="actionLock" class="action-switch" :disabled="disableActionSwitch"/>
             </template>
             <el-row class="icon-warp">
               <el-col :span="6" v-for="action in actionShowList1" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
                   <Roll
-                    eventNow ="bemp.png"
+                    eventNow ="semp.png"
                     :event_icons="action_icons"
                     :eventAfter="action.icon"
-                    pathString="icons/"
+                    iconMargin="2px"
                     ref="action"
                     v-if="action.show"
-                    iconMargin="2px"
                   />
                   <img :src="`icons/+${action.value}.png`" class="action-score" v-else/>
                 </transition>
@@ -29,13 +28,12 @@
               <el-col :span="6" v-for="action in actionShowList2" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
                   <Roll
-                    eventNow ="bemp.png"
+                    eventNow ="semp.png"
                     :event_icons="action_icons"
                     :eventAfter="action.icon"
-                    pathString="icons/"
+                    iconMargin="2px"
                     ref="action"
                     v-if="action.show"
-                    iconMargin="2px"
                   />
                   <img :src="`icons/+${action.value}.png`" class="action-score" v-else/>
                 </transition>
@@ -47,56 +45,83 @@
           <el-card id="event-card">
             <template #header>
               <span>事件</span>
-              <el-switch v-model="eventSwitch" class="event-switch"/>
+              <el-switch v-model="eventLock" class="event-switch" :disabled="disableEventSwitch"/>
             </template>
             <el-row class="icon-warp">
               <el-col :span="8">
                 <Roll
                   eventNow="bemp.png"
                   :event_icons="event_icons"
-                  :eventAfter="eventShow.icon"
-                  pathString="icons/"
+                  :eventAfter="eventShow"
+                  iconMargin="2px 10px"
                   ref="eventroll"
-                  iconMargin="10px"
                 />
               </el-col>
               <el-col :span="8">
                 <Roll
                   eventNow="bemp.png"
                   :event_icons="number_icons"
-                  :eventAfter="`bn${eventShow.value}.png`"
-                  pathString="icons/"
+                  :eventAfter="`bn${eventValue}.png`"
+                  iconMargin="2px 10px"
                   ref="eventrollvalue"
-                  iconMargin="10px"
                 />
-                <!-- <img :src="`img/number_icons/bn${eventShow.value}.png`" class="event-value"/> -->
               </el-col>
               <el-col :span="8">
                 <Roll
                   eventNow="bemp.png"
                   :event_icons="number_icons"
                   :eventAfter="`bn${eventRolled}.png`"
-                  pathString="icons/"
+                  iconMargin="2px 10px"
                   ref="eventresultroll"
-                  iconMargin="10px"
                 />
+              </el-col>
+            </el-row>
+            <el-row class="icon-warp">
+              <el-col :span="8">
+                <img src="icons/bemp.png" class="event-icon-block event-value"/>
+              </el-col>
+              <el-col :span="8">
+                <img :src="`icons/bn${determValue}.png`" class="event-value" />
+              </el-col>
+              <el-col :span="8">
+                <transition name="fast-fade" mode="out-in">
+                  <Roll
+                    eventNow="bemp.png"
+                    :event_icons="number_icons"
+                    :eventAfter="`bn${determRolled.value}.png`"
+                    iconMargin="2px 10px"
+                    ref="determroll"
+                    v-if="determRolled.show"
+                  />
+                  <img :src="`icons/bn${determRolledRevise}.png`" class="event-value" v-else/>
+                </transition>
               </el-col>
             </el-row>
           </el-card>
         </el-col>
         <el-col :lg="9" :sm="24">
-          <el-card id="logger-card">
+          <el-card id="status-card">
             <template #header>
               <span>状态</span>
             </template>
             <el-descriptions :column="3" size="mini">
               <el-descriptions-item label="动作点">{{actionPoint}}</el-descriptions-item>
               <el-descriptions-item label="事件点">{{eventPoint}}</el-descriptions-item>
+              <el-descriptions-item label="财富">{{money}}</el-descriptions-item>
+              <el-descriptions-item label="HP">{{status.hitpoint}}</el-descriptions-item>
+              <el-descriptions-item label="精神">{{status.spirit}}</el-descriptions-item>
+              <el-descriptions-item label="理智">{{status.sanity}}</el-descriptions-item>
+              <el-descriptions-item label="攻击">{{status.attack}}</el-descriptions-item>
+              <el-descriptions-item label="防御">{{status.defense}}</el-descriptions-item>
+              <el-descriptions-item label="力量">{{status.strength}}</el-descriptions-item>
+              <el-descriptions-item label="体质">{{status.constitution}}</el-descriptions-item>
+              <el-descriptions-item label="敏捷">{{status.dexterity}}</el-descriptions-item>
+              <el-descriptions-item label="意志">{{status.power}}</el-descriptions-item>
             </el-descriptions>
           </el-card>
         </el-col>
         <el-col :lg="12" :sm="24">
-          <el-card id="status-card">
+          <el-card id="skills-card">
             <template #header>
               <span>事件</span>
             </template>
@@ -107,7 +132,7 @@
             >
               <el-tab-pane
                 v-for="skill in displaySkillList"
-                :key="skill.name"
+                :key="skill.id"
                 :label="skill.name"
               >
                 <Skill
@@ -117,8 +142,8 @@
                   @choose="chooseSkill(skill.id)"
                 />
                 <div class="button-skill-action">
-                  <el-button type="success" size="mini" icon="el-icon-check" plain round></el-button>
-                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round></el-button>
+                  <el-button type="success" size="mini" icon="el-icon-check" plain round @click="chooseSkill(skill.id)"></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round ></el-button>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -139,9 +164,6 @@
 
 <script>
 // @ is an alias to /src
-import event_icons from '@/assets/event_icons.json'
-import action_icons from '@/assets/action_icons.json'
-import number_icons from '@/assets/number_icons.json'
 import skillList from '@/assets/skillList.json'
 import eventList from '@/assets/eventList.json'
 import _ from 'lodash'
@@ -161,33 +183,45 @@ export default {
       framerate: 60,
       letters:['a', 'ch', 'd', 'e', 'f', 'g', 'ie', 'ii', 'iu', 'k', 'l', 'm', 'n', 'oo', 'oz', 'p', 'ps', 'r', 's', 't', 'th', 'v', 'x', 'z'],
       number_icons: [],
-      skillList: skillList,
-      availableActionList: [],
       action_icons: [],
-      actionSwitch: false,
-      disableActionSwitch: false,
-      existActionList: ['bge.png'],
-      actionShowList: [
-        {icon: 'bgv.png', show: true, key: 0.1, value: 10},
-        {icon: 'cgm.png', show: true, key: 0.2, value: 10},
-        {icon: 'bgn.png', show: true, key: 0.3, value: 10},
-        {icon: 'cgie.png', show: true, key: 0.4, value: 10},
-        {icon: 'cgv.png', show: true, key: 0.5, value: 10},
-        {icon: 'cgii.png', show: true, key: 0.6, value: 10},
-        {icon: 'bgth.png', show: true, key: 0.7, value: 10},
-        {icon: 'rbgk.png', show: true, key: 0.8, value: 10},
-      ],
+      event_icons: [],
+      skillList: skillList,
       eventList: eventList,
-      event_icons: event_icons,
+      availableActionList: [],
+      availableEventList: [],
+      chosenSkillList: [],
+      chosenEventList: [],
+      actionSwitch: false,
       eventSwitch: false,
-      eventShow: {
-        icon: 'rbgk.png',
-        value: 9
+      disableActionSwitch: true,
+      disableEventSwitch: true,
+      actionLock: true,
+      eventLock: true,
+      existActionList: ['bge.png'],
+      actionShowList: [],
+      eventShow: 'rbgk.png',
+      eventValue: 9,
+      eventRolled: 6,
+      determValue: null,
+      determRolled: {
+        value: 5,
+        show: true
       },
-      eventRolled: 0,
+      determRolledRevise: 9,
       actionPoint: 11400,
-      eventPoint: 0,
-      chosenSkillList: []
+      eventPoint: 600,
+      money: 0,
+      status: {
+        hitpoint: 100,
+        spirit: 100,
+        sanity: 100,
+        attack: 0,
+        defense: 0,
+        strength: 0,
+        constitution: 0,
+        dexterity: 0,
+        power: 0
+      }
     }
   },
   computed: {
@@ -212,7 +246,7 @@ export default {
   },
   watch: {
     actionPoint: function (val, oldVal) {
-      if (val >= 12000 && !this.actionSwitch) {
+      if (val >= 12000 && !this.actionSwitch && this.actionLock) {
         this.actionSwitch = true
         this.actionPoint -= 1200
         this.actionShowList = _.fill(Array(8), 0).map(()=>({
@@ -238,13 +272,15 @@ export default {
       }
     },
     eventPoint: function (val, oldVal) {
-      if (val >= 1000 && !this.eventSwitch) {
+      if (val >= 1000 && !this.eventSwitch && this.eventLock) {
         this.eventSwitch = true
         this.eventPoint -= 1000
-        this.eventShow = {
-          icon: this.pickIcon().icon,
-          value: _.random(0, 9)
-        }
+        this.eventShow = this.pickIcon([
+            {color: 'rb', ratio: 95, value: 500},
+            {color: 'c', ratio: 70, value: 100},
+            {color: 'b', ratio: 0, value: 10}
+          ],'g', this.letters).icon
+        this.eventValue = _.random(0, 9)
         setTimeout(()=>{
           this.$refs.eventroll.roundEvent()
           this.$refs.eventrollvalue.roundEvent()
@@ -262,31 +298,48 @@ export default {
   mounted () {
     this.caculateFramerate()
     this.timeFlow()
-    this.action_icons = this.geneList(['b', 'y', 'rb'], ['g'], this.letters)
+    this.action_icons = this.geneList(['s', 'y', 'rb'], ['g'], this.letters)
     this.number_icons = this.geneList(['b'], ['n'], [0,1,2,3,4,5,6,7,8,9])
-    this.event_icons = this.geneList(['b', 'y', 'rb'], ['g'], this.letters)
+    this.event_icons = this.geneList(['b', 'c', 'rb'], ['g'], this.letters)
+    this.actionShowList = _.fill(Array(8), 0).map(()=>({
+      show: true,
+      key: nanoid(),
+      ...this.pickIcon()
+    }))
   },
   methods: {
-    pickIcon () {
-      let seed = _.random(1,100)
-      let color, type, letter, value
-      type = 'g'
-      if (seed > 95) {
-        color = 'rb'
-        letter = _.sample(this.letters)
-        value = 500
-      } else if (seed > 70) {
-        color = 'y'
-        letter = _.sample(this.letters)
-        value = 100
-      } else {
-        color = 'b'
-        letter = _.sample(this.letters)
-        value = 10
+    determRoll (determValue, determRolledValue, reviseValue) {
+      this.determValue = determValue
+      this.determRolled = {
+        value: determRolledValue,
+        show: true
       }
+      let revise = Math.round(this.determRolled.value + reviseValue)
+      if (revise < 0 ) {
+        this.determRolledRevise = 0
+      } else if (revise > 9) {
+        this.determRolledRevise = 9
+      } else {
+        this.determRolledRevise = revise
+      }
+      setTimeout(()=>{
+        this.$refs.determroll.fastRoundEvent()
+        setTimeout(()=>{
+          this.determRolled.show = false
+        }, 3000)
+      }, 250)
+    },
+    pickIcon (colorList = [
+      {color: 'rb', ratio: 95, value: 500},
+      {color: 'y', ratio: 70, value: 100},
+      {color: 's', ratio: 0, value: 10}
+      ], type = 'g', letters = this.letters) {
+      let seed = _.random(1,100)
+      let letter = _.sample(letters)
+      let foundInColor = _.find(colorList, c=>seed > c.ratio)
       return {
-        icon: `${color}${type}${letter}.png`,
-        value: value
+        icon: `${foundInColor.color}${type}${letter}.png`,
+        value: foundInColor.value
       }
     },
     convertActionPoint () {
@@ -305,7 +358,7 @@ export default {
       if (skill.activeAction.length == skill.nodes.length) {
         if (skill.onetime) this.chosenSkillList.push(id)
         this.existActionList = _.without(this.existActionList, ...skill.activeAction)
-
+        
       }
     },
     formatTime (timer) {
@@ -361,16 +414,18 @@ export default {
   .el-card
     text-align left
     margin-bottom 10px
-  #action-card, #event-card, #logger-card
+  #action-card, #event-card, #status-card
     height 284px
-  #status-card, #story-card
+  #skills-card, #story-card
     height 500px
   #skill-card
     height 435px
   .event-switch, .action-switch
     float right
   .event-value
-    margin 4px
+    margin 2px 10px
+  .event-icon-block
+    opacity 0
   .icon-warp
     margin 4px 0
     overflow hidden

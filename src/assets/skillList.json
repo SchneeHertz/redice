@@ -2,7 +2,8 @@
   {
     "id": "GbhgHBbgh",
     "name": "铁剑",
-    "cat": "武器",
+    "cat": "Equipment",
+    "onetime": false,
     "description": "一把铁制的短剑",
     "rare": 1,
     "nodes": [
@@ -17,14 +18,15 @@
         "icon": "bgch.png",
         "x": 1,
         "y": 2
-      },
-      {
-        "id": "bgoz21",
-        "icon": "bgoz.png",
-        "x": 2,
-        "y": 1
       }
-    ]
+    ],
+    "statusEffect": {
+      "attack": 1
+    },
+    "eventEffect": [],
+    "baseToken": [],
+    "addToken": [],
+    "removeToken": []
   },
   {
     "id": "gjhHHghgbu",
