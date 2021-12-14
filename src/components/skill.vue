@@ -50,8 +50,8 @@ export default {
           id: n.id,
           type: 'image',
           size: 94,
-          x: 94 * (n.x - 1) + 47,
-          y: 94 * (n.y - 1) + 47,
+          x: 94 * (+n.x - 1) + 47,
+          y: 94 * (+n.y - 1) + 47,
           img: imgPath + n.icon,
           style: {
             opacity: this.activeAction.includes(n.icon) ? 1 : 0.2

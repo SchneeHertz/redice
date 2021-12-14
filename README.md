@@ -1,4 +1,4 @@
-# rd
+# redice
 
 ## Project setup
 ```

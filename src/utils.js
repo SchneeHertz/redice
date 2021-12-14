@@ -1,6 +1,8 @@
-const path = requrie('path')
+const path = require('path')
 const fs = require('fs/promises')
 const XLSX = require('xlsx')
+const _ = require('lodash')
+const {nanoid} = require('nanoid')
 
 // ;(async ()=>{
 //   for (let folder of await fs.readdir('./assets', {withFileTypes: true})) {
@@ -14,8 +16,21 @@ const XLSX = require('xlsx')
 
 ;(async ()=>{
   let workbook = XLSX.readFile("../data.xlsx")
-  let mutationList = XLSX.utils.sheet_to_json(workbook.Sheets["Sheet1"])
-  await fs.writeFile('./assets/mutationList.json', JSON.stringify(mutationList, null, "  "))
-  let eventList = XLSX.utils.sheet_to_json(workbook.Sheets['Sheet2'])
+  let skillList = XLSX.utils.sheet_to_json(workbook.Sheets["skill"])
+  _.forIn(skillList, skill=>{
+    skill.nodes = _.split(skill.nodes, '|')
+                  .map(n=>_.zipObject(['icon', 'x', 'y'], _.split(n, '-')))
+                  .map(n=>{
+                    n.icon = n.icon + '.png'
+                    n.id = nanoid(8)
+                    return n
+                  })
+  })
+  await fs.writeFile('./assets/skillList.json', JSON.stringify(skillList, null, "  "))
+  let eventList = XLSX.utils.sheet_to_json(workbook.Sheets['event'])
+  _.forIn(eventList, event=>{
+    if (event.icon) event.icon = event.icon + '.png'
+    event.baseToken = _.split(event.baseToken, ',')
+  })
   await fs.writeFile('./assets/eventList.json', JSON.stringify(eventList, null, "  "))
 })()

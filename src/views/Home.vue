@@ -76,7 +76,7 @@
                 />
               </el-col>
             </el-row>
-            <el-row class="icon-warp">
+            <!-- <el-row class="icon-warp">
               <el-col :span="8">
                 <img src="icons/bemp.png" class="event-icon-block event-value"/>
               </el-col>
@@ -96,7 +96,7 @@
                   <img :src="`icons/bn${determRolledRevise}.png`" class="event-value" v-else/>
                 </transition>
               </el-col>
-            </el-row>
+            </el-row> -->
           </el-card>
         </el-col>
         <el-col :lg="9" :sm="24">
@@ -104,7 +104,7 @@
             <template #header>
               <span>状态</span>
             </template>
-            <el-descriptions :column="3" size="mini">
+            <el-descriptions :column="3" size="medium">
               <el-descriptions-item label="动作点">{{actionPoint}}</el-descriptions-item>
               <el-descriptions-item label="事件点">{{eventPoint}}</el-descriptions-item>
               <el-descriptions-item label="财富">{{money}}</el-descriptions-item>
@@ -117,6 +117,10 @@
               <el-descriptions-item label="体质">{{status.constitution}}</el-descriptions-item>
               <el-descriptions-item label="敏捷">{{status.dexterity}}</el-descriptions-item>
               <el-descriptions-item label="意志">{{status.power}}</el-descriptions-item>
+            </el-descriptions>
+            <el-descriptions :column="1" size="medium">
+              <el-descriptions-item label="武器">{{weapon.join(', ')}}</el-descriptions-item>
+              <el-descriptions-item label="背包">{{backpack.join(', ')}}</el-descriptions-item>
             </el-descriptions>
           </el-card>
         </el-col>
@@ -143,7 +147,7 @@
                 />
                 <div class="button-skill-action">
                   <el-button type="success" size="mini" icon="el-icon-check" plain round @click="chooseSkill(skill.id)"></el-button>
-                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round ></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round @click="printSkill"></el-button>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -154,6 +158,15 @@
             <template #header>
               <span>故事</span>
             </template>
+            <ul class="story-list">
+              <Story
+                v-for="story in displayStoryList"
+                :key="story.id"
+                v-bind="story"
+                :numberIcon="number_icons"
+                @choose-subid="solveChoose"
+              />
+            </ul>
           </el-card>
         </el-col>
       </el-row>
@@ -169,13 +182,15 @@ import eventList from '@/assets/eventList.json'
 import _ from 'lodash'
 import Roll from '@/components/roll.vue'
 import Skill from '@/components/skill.vue'
+import Story from '@/components/story.vue'
 import { nanoid } from 'nanoid'
 
 export default {
   name: 'Home',
   components: {
     Roll,
-    Skill
+    Skill,
+    Story
   },
   data () {
     return {
@@ -187,8 +202,8 @@ export default {
       event_icons: [],
       skillList: skillList,
       eventList: eventList,
+      prePickEventList: [],
       availableActionList: [],
-      availableEventList: [],
       chosenSkillList: [],
       chosenEventList: [],
       actionSwitch: false,
@@ -197,17 +212,11 @@ export default {
       disableEventSwitch: true,
       actionLock: true,
       eventLock: true,
-      existActionList: ['bge.png'],
+      existActionList: ['sgg.png', 'sgii.png'],
       actionShowList: [],
       eventShow: 'rbgk.png',
       eventValue: 9,
       eventRolled: 6,
-      determValue: null,
-      determRolled: {
-        value: 5,
-        show: true
-      },
-      determRolledRevise: 9,
       actionPoint: 11400,
       eventPoint: 600,
       money: 0,
@@ -221,7 +230,14 @@ export default {
         constitution: 0,
         dexterity: 0,
         power: 0
-      }
+      },
+      weapon: [],
+      backpack: [],
+      skillToken: [],
+      eventToken: [],
+      pickEvent: undefined,
+      pickEventFlow: undefined,
+      storyList: []
     }
   },
   computed: {
@@ -242,6 +258,18 @@ export default {
       })
       .sortBy(s=>-s.activeAction.length / s.nodes.length)
       .value()
+    },
+    tokenList () {
+      return this.skillToken.concat(this.eventToken)
+    },
+    availableEventList () {
+      return _.filter(this.prePickEventList, event=>{
+        if (!event.baseToken) event.baseToken = []
+        return _.every(event.baseToken, t=>_.includes(this.tokenList, t))
+      })
+    },
+    displayStoryList () {
+      return _.take(this.storyList, 30)
     }
   },
   watch: {
@@ -251,7 +279,7 @@ export default {
         this.actionPoint -= 1200
         this.actionShowList = _.fill(Array(8), 0).map(()=>({
           show: true,
-          key: _.random(0, 99999),
+          key: nanoid(8),
           ...this.pickIcon()
         }))
         for (let i=0; i<8; i++) {
@@ -275,23 +303,52 @@ export default {
       if (val >= 1000 && !this.eventSwitch && this.eventLock) {
         this.eventSwitch = true
         this.eventPoint -= 1000
-        this.eventShow = this.pickIcon([
-            {color: 'rb', ratio: 95, value: 500},
-            {color: 'c', ratio: 70, value: 100},
-            {color: 'b', ratio: 0, value: 10}
-          ],'g', this.letters).icon
-        this.eventValue = _.random(0, 9)
-        setTimeout(()=>{
-          this.$refs.eventroll.roundEvent()
-          this.$refs.eventrollvalue.roundEvent()
-          this.eventRolled = _.random(0, 9)
+        // this.eventShow = this.pickIcon([
+        //     {color: 'rb', ratio: 95, value: 500},
+        //     {color: 'c', ratio: 70, value: 100},
+        //     {color: 'b', ratio: 0, value: 10}
+        //   ],'g', this.letters).icon
+        // this.eventValue = _.random(0, 9)
+        this.pickEvent = _.sample(this.availableEventList)
+        this.pickEventFlow = _.filter(this.eventList, this.pickEvent.id)
+        this.eventShow = this.pickEvent.icon
+        if (this.pickEvent.action == "roll") {
+          this.eventValue = this.pickEvent.actionValue
           setTimeout(()=>{
-            this.$refs.eventresultroll.roundEvent()
+            this.$refs.eventroll.roundEvent()
+            this.$refs.eventrollvalue.roundEvent()
+            this.eventRolled = _.random(0, 9)
             setTimeout(()=>{
-              this.eventSwitch = false
+              this.storyList.unshift({
+                id: nanoid(),
+                messageType: 'message',
+                message: this.pickEvent.description
+              })
+              this.$refs.eventresultroll.roundEvent()
+              setTimeout(()=>{
+                this.eventLock = false
+                this.eventSwitch = false
+                this.solveEvent()
+              }, 4500)
             }, 4500)
-          }, 4500)
-        }, 1000)
+          }, 1000)
+        } else {
+          this.eventValue = 0
+          setTimeout(()=>{
+            this.$refs.eventroll.roundEvent()
+            this.$refs.eventrollvalue.roundEvent()
+            setTimeout(()=>{
+              this.storyList.unshift({
+                id: nanoid(),
+                messageType: 'message',
+                message: this.pickEvent.description
+              })
+              this.eventLock = false
+              this.eventSwitch = false
+              this.solveEvent()
+            }, 4500)
+          }, 1000)
+        }
       }
     }
   },
@@ -303,32 +360,13 @@ export default {
     this.event_icons = this.geneList(['b', 'c', 'rb'], ['g'], this.letters)
     this.actionShowList = _.fill(Array(8), 0).map(()=>({
       show: true,
-      key: nanoid(),
+      key: nanoid(8),
       ...this.pickIcon()
     }))
+    this.prePickEventList = _.filter(this.eventList, event=>_.has(event, 'icon'))
+    this.eventToken.push('野外')
   },
   methods: {
-    determRoll (determValue, determRolledValue, reviseValue) {
-      this.determValue = determValue
-      this.determRolled = {
-        value: determRolledValue,
-        show: true
-      }
-      let revise = Math.round(this.determRolled.value + reviseValue)
-      if (revise < 0 ) {
-        this.determRolledRevise = 0
-      } else if (revise > 9) {
-        this.determRolledRevise = 9
-      } else {
-        this.determRolledRevise = revise
-      }
-      setTimeout(()=>{
-        this.$refs.determroll.fastRoundEvent()
-        setTimeout(()=>{
-          this.determRolled.show = false
-        }, 3000)
-      }, 250)
-    },
     pickIcon (colorList = [
       {color: 'rb', ratio: 95, value: 500},
       {color: 'y', ratio: 70, value: 100},
@@ -358,8 +396,123 @@ export default {
       if (skill.activeAction.length == skill.nodes.length) {
         if (skill.onetime) this.chosenSkillList.push(id)
         this.existActionList = _.without(this.existActionList, ...skill.activeAction)
-        
+        _.forIn(skill.statusEffect, (val, key)=>{
+          this.$set(this.status, key, this.status[key] + val)
+        })
+        if (['weapon'].includes(skill.cat)) {
+          this.weapon.push(skill.name)
+        }
+        this.storyList.unshift({
+          id: nanoid(),
+          messageType: 'message',
+          message: skill.description
+        })
       }
+    },
+    printSkill () {
+      this.storyList.unshift({
+        id: nanoid(),
+        messageType: 'message',
+        message: nanoid()
+      })
+    },
+    solveEvent() {
+      if (this.pickEvent.action == 'roll') {
+        if (this.eventRolled >= this.eventValue) {
+          this.storyList.unshift({
+            id: nanoid(),
+            messageType: 'message',
+            message: this.pickEvent.success
+          })
+          setTimeout(()=>{
+            this.solveFlow(this.pickEvent.id, this.pickEvent.successRedirect)
+          }, 1000)
+        } else {
+          this.storyList.unshift({
+            id: nanoid(),
+            messageType: 'message',
+            message: this.pickEvent.fail
+          })
+          setTimeout(()=>{
+            this.solveFlow(this.pickEvent.id, this.pickEvent.failRedirect)
+          }, 1000)
+        }
+      } else {
+
+      }
+    },
+    solveFlow (id, subID) {
+      if (!_.isNumber(subID)) return false
+      let foundFlow = _.find(this.eventList, {id: id, subID: subID})
+      switch (foundFlow.action) {
+        case 'roll':
+          let rolled = _.random(0, 9)
+          let extraPoint = this.status[foundFlow.actionType] || 0
+          let result = Math.round(rolled + extraPoint) > 9 ? 9 : Math.round(rolled + extraPoint) < 0 ? 0 : Math.round(rolled + extraPoint)
+          this.storyList.unshift({
+            id: nanoid(),
+            messageType: 'roll',
+            message: foundFlow.subFlowDescription,
+            rollType: foundFlow.actionType,
+            determValue: foundFlow.actionValue,
+            determRolled: {
+              value: rolled,
+              show: true
+            },
+            determRolledRevise: result,
+            determResult: result >= foundFlow.actionValue,
+            success: foundFlow.success,
+            fail: foundFlow.fail
+          })
+          setTimeout(()=>{
+            if (result >= foundFlow.actionValue) {
+              this.solveFlow(id, foundFlow.successRedirect)
+            } else {
+              this.solveFlow(id, foundFlow.failRedirect)
+            }
+          }, 5000)
+          break
+        case 'check':
+          let checkFunction = eval('a=>' + foundFlow.actionValue)
+          if (checkFunction(_.get(this, foundFlow.actionType))) {
+            this.storyList.unshift({
+              id: nanoid(),
+              messageType: 'message',
+              message: foundFlow.success
+            })
+            setTimeout(()=>{
+              this.solveFlow(id, foundFlow.successRedirect)
+            }, 1000)
+          } else {
+            this.storyList.unshift({
+              id: nanoid(),
+              messageType: 'message',
+              message: foundFlow.fail
+            })
+            setTimeout(()=>{
+              this.solveFlow(id, foundFlow.failRedirect)
+            }, 1000)
+          }
+          break
+        case 'choose':
+          this.storyList.unshift({
+            id: nanoid(),
+            messageType: 'choose',
+            message: foundFlow.subFlowDescription,
+            optionList: JSON.parse(foundFlow.optionList)
+          })
+          break
+        case 'nothing':
+          this.storyList.unshift({
+            id: nanoid(),
+            messageType: 'message',
+            message: foundFlow.subFlowDescription
+          })
+          break
+      }
+    },
+    solveChoose (subID) {
+      this.solveFlow(this.pickEvent.id, subID)
     },
     formatTime (timer) {
       return new Intl.NumberFormat().format(timer)
@@ -385,7 +538,6 @@ export default {
         if (++count % this.framerate == 0) {
           this.timer += 60
           this.actionPoint += 100
-          // this.calculateBiomass()
         }
         requestAnimationFrame(tick)
       }
@@ -433,6 +585,11 @@ export default {
     margin 2px
   .button-skill-action
     float right
+  .story-list
+    height 436px
+    margin 0
+    padding 0
+    overflow auto
 
   .fast-fade-leave-active, .fast-fade-enter-active
     transition all 0.1s
@@ -452,4 +609,6 @@ export default {
     padding 10px 20px
   .el-tabs__header.is-left
     width 148px
+  #event-card .el-card__body
+    padding-top 60px
 </style>

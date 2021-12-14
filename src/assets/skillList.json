@@ -1,58 +1,25 @@
 [
   {
-    "id": "GbhgHBbgh",
-    "name": "铁剑",
-    "cat": "Equipment",
+    "id": "40cM8KGa",
+    "name": "树枝",
+    "cat": "weapon",
     "onetime": false,
-    "description": "一把铁制的短剑",
+    "description": "你捡到一根树枝，它韧性很好，似乎很适合挥舞",
     "rare": 1,
     "nodes": [
       {
-        "id": "bge11",
-        "icon": "bge.png",
-        "x": 1,
-        "y": 1
+        "icon": "sgii.png",
+        "x": "2",
+        "y": "3",
+        "id": "1Rfl394E"
       },
       {
-        "id": "bgch12",
-        "icon": "bgch.png",
-        "x": 1,
-        "y": 2
+        "icon": "sgg.png",
+        "x": "3",
+        "y": "2",
+        "id": "bc4Y5nwU"
       }
     ],
-    "statusEffect": {
-      "attack": 1
-    },
-    "eventEffect": [],
-    "baseToken": [],
-    "addToken": [],
-    "removeToken": []
-  },
-  {
-    "id": "gjhHHghgbu",
-    "name": "转生为史莱姆",
-    "cat": "转生",
-    "description": "史莱姆是一种粘稠的细胞集合体",
-    "rare": 1,
-    "nodes": [
-      {
-        "id": "rbgs11",
-        "icon": "rbgs.png",
-        "x": 1,
-        "y": 1
-      },
-      {
-        "id": "cgl12",
-        "icon": "cgl.png",
-        "x": 1,
-        "y": 2
-      },
-      {
-        "id": "bgm13",
-        "icon": "bgm.png",
-        "x": 1,
-        "y": 3
-      }
-    ]
+    "baseToken": "野外"
   }
 ]
