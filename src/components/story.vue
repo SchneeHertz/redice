@@ -15,19 +15,22 @@
         <p class="message-line">{{determResult ? success : fail}}</p>
       </el-row>
       <el-row v-else class="icon-warp">
-        <img :src="`icons/bn${determValue}.png`" class="event-value" />
-        <transition name="fast-fade" mode="out-in">
-          <Roll
-            eventNow="bemp.png"
-            :event_icons="numberIcon"
-            :eventAfter="`bn${determRolled.value}.png`"
-            iconMargin="2px 10px"
-            ref="determroll"
-            v-if="determRolled.show"
-            class="event-value"
-          />
-          <img :src="`icons/bn${determRolledRevise}.png`" class="event-value" v-else/>
-        </transition>
+        <el-col :span="5">
+          <img :src="`icons/bn${determValue}.png`" />
+        </el-col>
+        <el-col :span="5">
+          <transition name="fast-fade" mode="out-in">
+            <Roll
+              eventNow="bemp.png"
+              :event_icons="numberIcon"
+              :eventAfter="`bn${determRolled.value}.png`"
+              iconMargin="0"
+              ref="determroll"
+              v-if="determRolled.show"
+            />
+            <img :src="`icons/bn${determRolledRevise}.png`" v-else/>
+          </transition>
+        </el-col>
       </el-row>
     </div>
     <div v-else-if="messageType == 'choose'" class="list-block">
@@ -135,9 +138,6 @@ export default {
 .icon-warp
   margin 4px 0
   overflow hidden
-.event-value
-  margin 2px 10px
-  display inline-block
 
 .fast-fade-leave-active, .fast-fade-enter-active
     transition all 0.1s

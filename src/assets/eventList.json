@@ -10,7 +10,7 @@
     "subFlowDescription": "史莱姆A注意到了你",
     "action": "roll",
     "actionType": "luck",
-    "actionValue": 9,
+    "actionValue": 6,
     "success": "史莱姆A无视了你，继续朝旁边跳去",
     "fail": "史莱姆A朝你跳了过来",
     "failRedirect": 2,
@@ -76,7 +76,7 @@
     "id": "6W7WGZDd",
     "subID": 6,
     "subFlowDescription": "史莱姆A的目标似乎不是你，它继续往前跳，离你越来越远，直到在你的视野中消失",
-    "action": "nothing",
+    "action": "end",
     "baseToken": [
       ""
     ]
@@ -85,7 +85,7 @@
     "id": "6W7WGZDd",
     "subID": 7,
     "subFlowDescription": "史莱姆A继续向你背后的反向跳，离你越来越远，直到在你的视野中消失",
-    "action": "nothing",
+    "action": "end",
     "baseToken": [
       ""
     ]
@@ -94,7 +94,7 @@
     "id": "6W7WGZDd",
     "subID": 8,
     "subFlowDescription": "地上留下了一滩粘液，你没有找到其他有价值的东西",
-    "action": "nothing",
+    "action": "end",
     "baseToken": [
       ""
     ]
@@ -103,7 +103,7 @@
     "id": "6W7WGZDd",
     "subID": 9,
     "subFlowDescription": "你手上沾了一些史莱姆的体液，你感觉皮肤有些微微发热，于是你就近找了一些干树叶，把粘液擦掉了",
-    "action": "nothing",
+    "action": "end",
     "addToken": "史莱姆A的印记",
     "baseToken": [
       ""

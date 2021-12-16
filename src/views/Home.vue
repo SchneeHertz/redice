@@ -76,27 +76,6 @@
                 />
               </el-col>
             </el-row>
-            <!-- <el-row class="icon-warp">
-              <el-col :span="8">
-                <img src="icons/bemp.png" class="event-icon-block event-value"/>
-              </el-col>
-              <el-col :span="8">
-                <img :src="`icons/bn${determValue}.png`" class="event-value" />
-              </el-col>
-              <el-col :span="8">
-                <transition name="fast-fade" mode="out-in">
-                  <Roll
-                    eventNow="bemp.png"
-                    :event_icons="number_icons"
-                    :eventAfter="`bn${determRolled.value}.png`"
-                    iconMargin="2px 10px"
-                    ref="determroll"
-                    v-if="determRolled.show"
-                  />
-                  <img :src="`icons/bn${determRolledRevise}.png`" class="event-value" v-else/>
-                </transition>
-              </el-col>
-            </el-row> -->
           </el-card>
         </el-col>
         <el-col :lg="9" :sm="24">
@@ -147,7 +126,7 @@
                 />
                 <div class="button-skill-action">
                   <el-button type="success" size="mini" icon="el-icon-check" plain round @click="chooseSkill(skill.id)"></el-button>
-                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round @click="printSkill"></el-button>
+                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round></el-button>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -206,8 +185,8 @@ export default {
       availableActionList: [],
       chosenSkillList: [],
       chosenEventList: [],
-      actionSwitch: false,
-      eventSwitch: false,
+      actionSwitch: true,
+      eventSwitch: true,
       disableActionSwitch: true,
       disableEventSwitch: true,
       actionLock: true,
@@ -274,8 +253,8 @@ export default {
   },
   watch: {
     actionPoint: function (val, oldVal) {
-      if (val >= 12000 && !this.actionSwitch && this.actionLock) {
-        this.actionSwitch = true
+      if (val >= 12000 && this.actionSwitch && this.actionLock) {
+        this.actionSwitch = false
         this.actionPoint -= 1200
         this.actionShowList = _.fill(Array(8), 0).map(()=>({
           show: true,
@@ -292,7 +271,7 @@ export default {
               this.$refs.action[i].roundEvent()
               setTimeout(()=>{
                 this.convertActionPoint()
-                setTimeout(()=>{this.actionSwitch = false}, 1000)
+                setTimeout(()=>{this.actionSwitch = true}, 1000)
               }, 5000)
             }, 250*i)
           }
@@ -300,15 +279,9 @@ export default {
       }
     },
     eventPoint: function (val, oldVal) {
-      if (val >= 1000 && !this.eventSwitch && this.eventLock) {
-        this.eventSwitch = true
+      if (val >= 1000 && this.eventSwitch && this.eventLock) {
+        this.eventSwitch = false
         this.eventPoint -= 1000
-        // this.eventShow = this.pickIcon([
-        //     {color: 'rb', ratio: 95, value: 500},
-        //     {color: 'c', ratio: 70, value: 100},
-        //     {color: 'b', ratio: 0, value: 10}
-        //   ],'g', this.letters).icon
-        // this.eventValue = _.random(0, 9)
         this.pickEvent = _.sample(this.availableEventList)
         this.pickEventFlow = _.filter(this.eventList, this.pickEvent.id)
         this.eventShow = this.pickEvent.icon
@@ -326,8 +299,6 @@ export default {
               })
               this.$refs.eventresultroll.roundEvent()
               setTimeout(()=>{
-                this.eventLock = false
-                this.eventSwitch = false
                 this.solveEvent()
               }, 4500)
             }, 4500)
@@ -343,8 +314,6 @@ export default {
                 messageType: 'message',
                 message: this.pickEvent.description
               })
-              this.eventLock = false
-              this.eventSwitch = false
               this.solveEvent()
             }, 4500)
           }, 1000)
@@ -365,8 +334,21 @@ export default {
     }))
     this.prePickEventList = _.filter(this.eventList, event=>_.has(event, 'icon'))
     this.eventToken.push('野外')
+    this.talk(['1','2','3','4','5'])
   },
   methods: {
+    talk (remarks = [], delay = 2000) {
+      if (remarks.length > 0){
+        setTimeout(()=>{
+          this.storyList.unshift({
+            id: nanoid(),
+            messageType: 'message',
+            message: remarks.shift()
+          })
+          this.talk(remarks)
+        }, delay)
+      }
+    },
     pickIcon (colorList = [
       {color: 'rb', ratio: 95, value: 500},
       {color: 'y', ratio: 70, value: 100},
@@ -408,13 +390,6 @@ export default {
           message: skill.description
         })
       }
-    },
-    printSkill () {
-      this.storyList.unshift({
-        id: nanoid(),
-        messageType: 'message',
-        message: nanoid()
-      })
     },
     solveEvent() {
       if (this.pickEvent.action == 'roll') {
@@ -502,12 +477,13 @@ export default {
             optionList: JSON.parse(foundFlow.optionList)
           })
           break
-        case 'nothing':
+        case 'end':
           this.storyList.unshift({
             id: nanoid(),
             messageType: 'message',
             message: foundFlow.subFlowDescription
           })
+          this.eventSwitch = true
           break
       }
     },
