@@ -23,7 +23,7 @@ const {nanoid} = require('nanoid')
       item.nodes = _.split(item.nodes, '|')
                     .map(n=>_.zipObject(['icon', 'x', 'y'], _.split(n, '-')))
                     .map(n=>{
-                      n.icon = n.icon + '.png'
+                      n.icon = n.icon + '.webp'
                       n.id = nanoid(8)
                       return n
                     })
@@ -32,7 +32,7 @@ const {nanoid} = require('nanoid')
     })
     let eventList = XLSX.utils.sheet_to_json(workbook.Sheets['event'])
     _.forIn(eventList, event=>{
-      if (event.icon) event.icon = event.icon + '.png'
+      if (event.icon) event.icon = event.icon + '.webp'
       event.baseToken = _(event.baseToken).split(',').compact().value()
       event.statusEffect = JSON.parse(event.statusEffect || '{}')
       event.eventEffect = JSON.parse(event.eventEffect || '{}')

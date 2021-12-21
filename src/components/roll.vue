@@ -28,7 +28,7 @@ export default {
       trigger: true,
       eventImage1st: this.pathString + this.eventNow,
       eventImage2nd: this.pathString + this.eventNow,
-      imageBlock: this.pathString + 'bemp.png',
+      imageBlock: this.pathString + 'bemp.webp',
       fadeType: ''
     }
   },

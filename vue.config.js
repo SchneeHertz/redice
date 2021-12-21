@@ -1,3 +1,5 @@
 module.exports = {
-  publicPath: '/redice/'
+  publicPath: '/redice/',
+  productionSourceMap: false,
+  outputDir: 'docs'
 }

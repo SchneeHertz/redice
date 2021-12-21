@@ -16,19 +16,19 @@
       </el-row>
       <el-row v-else class="icon-warp">
         <el-col :span="5">
-          <img :src="`icons/bn${determValue}.png`" />
+          <img :src="`icons/bn${determValue}.webp`" />
         </el-col>
         <el-col :span="5">
           <transition name="fast-fade" mode="out-in">
             <Roll
-              eventNow="bemp.png"
+              eventNow="bemp.webp"
               :event_icons="numberIcon"
-              :eventAfter="`bn${determRolled.value}.png`"
+              :eventAfter="`bn${determRolled.value}.webp`"
               iconMargin="0"
               ref="determroll"
               v-if="determRolled.show"
             />
-            <img :src="`icons/bn${determRolledRevise}.png`" v-else/>
+            <img :src="`icons/bn${determRolledRevise}.webp`" v-else/>
           </transition>
         </el-col>
       </el-row>

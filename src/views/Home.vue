@@ -13,14 +13,14 @@
               <el-col :span="6" v-for="action in actionShowList1" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
                   <Roll
-                    eventNow ="semp.png"
+                    eventNow ="semp.webp"
                     :event_icons="action_icons"
                     :eventAfter="action.icon"
                     iconMargin="2px"
                     ref="action"
                     v-if="action.show"
                   />
-                  <img :src="`icons/+${action.value}.png`" class="action-score" v-else/>
+                  <img :src="`icons/+${action.value}.webp`" class="action-score" v-else/>
                 </transition>
               </el-col>
             </el-row>
@@ -28,14 +28,14 @@
               <el-col :span="6" v-for="action in actionShowList2" :key="action.key">
                 <transition name="fast-fade" mode="out-in">
                   <Roll
-                    eventNow ="semp.png"
+                    eventNow ="semp.webp"
                     :event_icons="action_icons"
                     :eventAfter="action.icon"
                     iconMargin="2px"
                     ref="action"
                     v-if="action.show"
                   />
-                  <img :src="`icons/+${action.value}.png`" class="action-score" v-else/>
+                  <img :src="`icons/+${action.value}.webp`" class="action-score" v-else/>
                 </transition>
               </el-col>
             </el-row>
@@ -50,7 +50,7 @@
             <el-row class="icon-warp">
               <el-col :span="8">
                 <Roll
-                  eventNow="bemp.png"
+                  eventNow="bemp.webp"
                   :event_icons="event_icons"
                   :eventAfter="eventShow"
                   iconMargin="2px 10px"
@@ -59,18 +59,18 @@
               </el-col>
               <el-col :span="8">
                 <Roll
-                  eventNow="bemp.png"
+                  eventNow="bemp.webp"
                   :event_icons="number_icons"
-                  :eventAfter="`bn${eventValue}.png`"
+                  :eventAfter="`bn${eventValue}.webp`"
                   iconMargin="2px 10px"
                   ref="eventrollvalue"
                 />
               </el-col>
               <el-col :span="8">
                 <Roll
-                  eventNow="bemp.png"
+                  eventNow="bemp.webp"
                   :event_icons="number_icons"
-                  :eventAfter="`bn${eventRolled}.png`"
+                  :eventAfter="`bn${eventRolled}.webp`"
                   iconMargin="2px 10px"
                   ref="eventresultroll"
                 />
@@ -229,9 +229,9 @@ export default {
       disableEventSwitch: true,
       actionLock: true,
       eventLock: true,
-      existActionList: ['sgf.png', 'sgoz.png', 'ygl.png'],
+      existActionList: ['sgf.webp', 'sgoz.webp', 'ygl.webp'],
       actionShowList: [],
-      eventShow: 'rbgk.png',
+      eventShow: 'rbgk.webp',
       eventValue: 9,
       eventRolled: 6,
       actionPoint: 3000,
@@ -451,7 +451,7 @@ export default {
       let letter = _.sample(letters)
       let foundInColor = _.find(colorList, c=>seed > c.ratio)
       return {
-        icon: `${foundInColor.color}${type}${letter}.png`,
+        icon: `${foundInColor.color}${type}${letter}.webp`,
         value: foundInColor.value
       }
     },
@@ -710,7 +710,7 @@ export default {
       _.forIn(arrayA, elementInA=>{
         _.forIn(arrayB, elementInB=>{
           _.forIn(arrayC, elementInC=>{
-            resultList.push(elementInA + elementInB + elementInC + '.png')
+            resultList.push(elementInA + elementInB + elementInC + '.webp')
           })
         })
       })
