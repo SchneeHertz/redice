@@ -86,21 +86,13 @@ export default {
   data () {
     return {
       rolled: false,
-      statusObject: {
-        attack: '攻击',
-        defense: '防御',
-        strength: '体力',
-        constitution: '体质',
-        dexterity: '敏捷',
-        power: '意志'
-      },
       chosen: false,
       chosenValue: undefined
     }
   },
   computed: {
     rollMessage () {
-      return this.statusObject[this.rollType] + '检定'
+      return this.rollType + '检定'
     }
   },
   mounted () {

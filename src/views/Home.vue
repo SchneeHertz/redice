@@ -1,6 +1,6 @@
 <template>
   <div class="home">
-    <h1>异世界转生模拟器</h1>
+    <span class="main-heading">TRPG模拟器</span><span class="sub-heading">({{subHeading}})</span>
     <el-card id="content">
       <el-row :gutter="10" id="card-row">
         <el-col :lg="8" :sm="24">
@@ -79,53 +79,86 @@
           </el-card>
         </el-col>
         <el-col :lg="9" :sm="24">
-          <el-card id="status-card">
+          <el-card id="market-card" v-show="displayMarket">
+            <template #header>
+              <span>市场 ({{money}};{{stock}})</span>
+              <el-button class="card-header-button" type="primary" size="mini" plain>购买一组扭蛋</el-button>
+              <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">切换到状态</el-button>
+            </template>
+            <el-row>
+              <el-col :span="5">
+                <span class="price-now">当前价:{{price}}</span>
+              </el-col>
+              <el-col :span="14">
+                <el-input size="mini" v-model.number="trade">
+                  <template #append>
+                    <el-button icon="el-icon-plus" @click="stockBuy"></el-button>
+                    <el-button icon="el-icon-minus" @click="stockSell"></el-button>
+                  </template>
+                </el-input>
+              </el-col>
+              <el-col :span="5">
+                <el-select v-model="leverage" placeholder="杠杆" size="mini">
+                  <el-option
+                    v-for="item in leverageOption"
+                    :key="item.value"
+                    :label="item.label"
+                    :value="item.value">
+                  </el-option>
+                </el-select>
+              </el-col>
+            </el-row>
+            <div id="k-graph"></div>
+          </el-card>
+          <el-card id="status-card" v-show="!displayMarket">
             <template #header>
               <span>状态</span>
+              <el-button class="card-header-button" type="primary" size="mini" plain>购买一组扭蛋</el-button>
+              <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">切换到市场</el-button>
             </template>
-            <el-descriptions :column="3" size="medium">
+            <el-descriptions :column="3" size="mini">
               <el-descriptions-item label="动作点">{{actionPoint}}</el-descriptions-item>
               <el-descriptions-item label="事件点">{{eventPoint}}</el-descriptions-item>
-              <el-descriptions-item label="财富">{{money}}</el-descriptions-item>
-              <el-descriptions-item label="HP">{{status.hitpoint}}</el-descriptions-item>
-              <el-descriptions-item label="精神">{{status.spirit}}</el-descriptions-item>
-              <el-descriptions-item label="理智">{{status.sanity}}</el-descriptions-item>
-              <el-descriptions-item label="攻击">{{status.attack}}</el-descriptions-item>
-              <el-descriptions-item label="防御">{{status.defense}}</el-descriptions-item>
-              <el-descriptions-item label="力量">{{status.strength}}</el-descriptions-item>
-              <el-descriptions-item label="体质">{{status.constitution}}</el-descriptions-item>
-              <el-descriptions-item label="敏捷">{{status.dexterity}}</el-descriptions-item>
-              <el-descriptions-item label="意志">{{status.power}}</el-descriptions-item>
+              <el-descriptions-item label="余额">{{money}}</el-descriptions-item>
             </el-descriptions>
-            <el-descriptions :column="1" size="medium">
-              <el-descriptions-item label="武器">{{weapon.join(', ')}}</el-descriptions-item>
-              <el-descriptions-item label="背包">{{backpack.join(', ')}}</el-descriptions-item>
+            <el-descriptions :column="descriptionColumn" size="mini">
+              <el-descriptions-item 
+                v-for="(value, key) in status"
+                :key="key"
+                :label="key">{{value}}</el-descriptions-item>
+            </el-descriptions>
+            <el-descriptions :column="1" size="mini">
+              <el-descriptions-item 
+                v-for="(pack, key) in backpack"
+                :key="key"
+                :label="key"
+              >{{pack.join(', ')}}</el-descriptions-item>
             </el-descriptions>
           </el-card>
         </el-col>
         <el-col :lg="12" :sm="24">
-          <el-card id="skills-card">
+          <el-card id="items-card">
             <template #header>
               <span>事件</span>
             </template>
             <el-tabs
-              id="skill-card"
+              id="item-card"
               type="border-card"
               tabPosition="left"
             >
               <el-tab-pane
-                v-for="skill in displaySkillList"
-                :key="skill.id"
-                :label="skill.name"
+                v-for="item in displayItemList"
+                :key="item.id"
+                :label="item.name"
               >
-                <Skill
-                  :id="skill.id"
-                  :nodes="skill.nodes"
-                  :activeAction="skill.activeAction"
-                  @choose="chooseSkill(skill.id)"
+                <Item
+                  :id="item.id"
+                  :nodes="item.nodes"
+                  :activeAction="item.activeAction"
+                  @choose="chooseItem(item.id)"
                 />
-                <div class="button-skill-action">
-                  <el-button type="success" size="mini" icon="el-icon-check" plain round @click="chooseSkill(skill.id)"></el-button>
+                <div class="button-item-action">
+                  <el-button type="success" size="mini" icon="el-icon-check" plain round @click="chooseItem(item.id)"></el-button>
                   <el-button type="danger" size="mini" icon="el-icon-delete" plain round></el-button>
                 </div>
               </el-tab-pane>
@@ -156,20 +189,25 @@
 
 <script>
 // @ is an alias to /src
-import skillList from '@/assets/skillList.json'
-import eventList from '@/assets/eventList.json'
+// import itemList from '@/assets/itemList.json'
+// import eventList from '@/assets/eventList.json'
+// import scriptData from '@/assets/scriptData.json'
 import _ from 'lodash'
 import Roll from '@/components/roll.vue'
-import Skill from '@/components/skill.vue'
+import Item from '@/components/item.vue'
 import Story from '@/components/story.vue'
 import { nanoid } from 'nanoid'
+import { Stock } from '@antv/g2plot'
 
 export default {
   name: 'Home',
   components: {
     Roll,
-    Skill,
+    Item,
     Story
+  },
+  props: {
+    script: String
   },
   data () {
     return {
@@ -179,11 +217,11 @@ export default {
       number_icons: [],
       action_icons: [],
       event_icons: [],
-      skillList: skillList,
-      eventList: eventList,
+      itemList: [],
+      eventList: [],
       prePickEventList: [],
       availableActionList: [],
-      chosenSkillList: [],
+      chosenItemList: [],
       chosenEventList: [],
       actionSwitch: true,
       eventSwitch: true,
@@ -191,32 +229,54 @@ export default {
       disableEventSwitch: true,
       actionLock: true,
       eventLock: true,
-      existActionList: ['sgg.png', 'sgii.png'],
+      existActionList: ['sgf.png', 'sgoz.png', 'ygl.png'],
       actionShowList: [],
       eventShow: 'rbgk.png',
       eventValue: 9,
       eventRolled: 6,
-      actionPoint: 11400,
-      eventPoint: 600,
-      money: 0,
-      status: {
-        hitpoint: 100,
-        spirit: 100,
-        sanity: 100,
-        attack: 0,
-        defense: 0,
-        strength: 0,
-        constitution: 0,
-        dexterity: 0,
-        power: 0
-      },
-      weapon: [],
+      actionPoint: 3000,
+      eventPoint: 0,
+      descriptionColumn: 3,
+      status: {},
       backpack: [],
-      skillToken: [],
+      itemToken: [],
       eventToken: [],
       pickEvent: undefined,
       pickEventFlow: undefined,
-      storyList: []
+      storyList: [],
+      subHeading: undefined,
+      displayMarket: false,
+      money: 0,
+      trade: 0,
+      marketHistory: [{
+        open: 1,
+        close: 1,
+        high: 1,
+        low: 1,
+        time: Date.now()
+      }],
+      marketTime: 1,
+      second: 0,
+      price: 1,
+      leverage: 1,
+      leverageOption: [{
+        label: '1x',
+        value: 1
+      }, {
+        label: '5x',
+        value: 5
+      }, {
+        label: '10x',
+        value: 10
+      }, {
+        label: '50x',
+        value: 50
+      }, {
+        label: '100x',
+        value: 100
+      }],
+      stock: 0,
+      stockGraph: undefined
     }
   },
   computed: {
@@ -226,20 +286,20 @@ export default {
     actionShowList2 () {
       return this.actionShowList.slice(4, 8)
     },
-    displaySkillList () {
-      return _(_.cloneDeep(this.skillList)).map(s=>{
+    displayItemList () {
+      return _(_.cloneDeep(this.itemList)).map(s=>{
         let nodeIcons = s.nodes.map(n=>n.icon)
         s.activeAction = _.filter(this.existActionList, a=>nodeIcons.includes(a))
         return s
       })
       .filter(s=>{
-        return !(_.isEmpty(s.activeAction) || this.chosenSkillList.includes(s.id))
+        return !(_.isEmpty(s.activeAction) || this.chosenItemList.includes(s.id))
       })
       .sortBy(s=>-s.activeAction.length / s.nodes.length)
       .value()
     },
     tokenList () {
-      return this.skillToken.concat(this.eventToken)
+      return this.itemToken.concat(this.eventToken)
     },
     availableEventList () {
       return _.filter(this.prePickEventList, event=>{
@@ -253,7 +313,7 @@ export default {
   },
   watch: {
     actionPoint: function (val, oldVal) {
-      if (val >= 12000 && this.actionSwitch && this.actionLock) {
+      if (val >= 1200 && this.actionSwitch && this.actionLock) {
         this.actionSwitch = false
         this.actionPoint -= 1200
         this.actionShowList = _.fill(Array(8), 0).map(()=>({
@@ -279,7 +339,7 @@ export default {
       }
     },
     eventPoint: function (val, oldVal) {
-      if (val >= 1000 && this.eventSwitch && this.eventLock) {
+      if (val >= 1000 && this.eventSwitch && this.eventLock && this.availableEventList.length > 0) {
         this.eventSwitch = false
         this.eventPoint -= 1000
         this.pickEvent = _.sample(this.availableEventList)
@@ -332,12 +392,45 @@ export default {
       key: nanoid(8),
       ...this.pickIcon()
     }))
-    this.prePickEventList = _.filter(this.eventList, event=>_.has(event, 'icon'))
-    this.eventToken.push('野外')
-    this.talk(['1','2','3','4','5'])
+    setInterval(()=>{
+      this.money += 1
+    }, 1000)
+    this.createGraph()
+    setInterval(()=>{
+      this.stockGraph.update({
+        data: this.marketHistory,
+      })
+    }, 10000)
+
+    this.$http.get(`/redice/data/${this.script}.json`)
+    .then(res=>{
+      
+      let scriptData = res.data
+      this.itemList = scriptData.itemList
+      this.eventList = scriptData.eventList
+      this.descriptionColumn = scriptData.column
+      this.status = scriptData.status
+      this.subHeading = scriptData.name
+      this.backpack = scriptData.backpack
+
+      this.prePickEventList = _.filter(this.eventList, event=>_.has(event, 'icon'))
+
+      // test code
+      // this.eventToken.push('野外')
+      // this.talk(['1','2','3','4','5'])
+    })
+    .catch(()=>{
+      this.$router.push('/')
+    })
   },
   methods: {
     talk (remarks = [], delay = 2000) {
+      remarks = _.cloneDeep(remarks)
+      this.storyList.unshift({
+        id: nanoid(),
+        messageType: 'message',
+        message: remarks.shift()
+      })
       if (remarks.length > 0){
         setTimeout(()=>{
           this.storyList.unshift({
@@ -350,8 +443,8 @@ export default {
       }
     },
     pickIcon (colorList = [
-      {color: 'rb', ratio: 95, value: 500},
-      {color: 'y', ratio: 70, value: 100},
+      {color: 'rb', ratio: 98, value: 500},
+      {color: 'y', ratio: 80, value: 100},
       {color: 's', ratio: 0, value: 10}
       ], type = 'g', letters = this.letters) {
       let seed = _.random(1,100)
@@ -373,23 +466,37 @@ export default {
         this.eventPoint += 50
       })
     },
-    chooseSkill (id) {
-      let skill = _.find(this.displaySkillList, {id: id})
-      if (skill.activeAction.length == skill.nodes.length) {
-        if (skill.onetime) this.chosenSkillList.push(id)
-        this.existActionList = _.without(this.existActionList, ...skill.activeAction)
-        _.forIn(skill.statusEffect, (val, key)=>{
-          this.$set(this.status, key, this.status[key] + val)
-        })
-        if (['weapon'].includes(skill.cat)) {
-          this.weapon.push(skill.name)
+    chooseItem (id) {
+      let item = _.find(this.displayItemList, {id: id})
+      if (item.activeAction.length == item.nodes.length) {
+        if (item.onetime) this.chosenItemList.push(id)
+        this.existActionList = _.without(this.existActionList, ...item.activeAction)
+        this.handleEffect(_.pick(item, ['statusEffect', 'eventEffect']))
+        if (item.addToken) {
+          this.itemToken = _([...this.itemToken, ...item.addToken]).uniq().compact().value()
         }
+        // if (['backpack'].includes(item.cat)) {
+        //   this.backpack.push(item.name)
+        // }
+        if (!_.isEmpty(item.description)) {
+          this.storyList.unshift({
+            id: nanoid(),
+            messageType: 'message',
+            message: item.description
+          })
+        }
+      }
+    },
+    triggerEvent (name) {
+      this.pickEvent = _.find(this.prePickEventList, {name: name})
+      if (!_.isEmpty(this.pickEvent.description)) {
         this.storyList.unshift({
           id: nanoid(),
           messageType: 'message',
-          message: skill.description
+          message: this.pickEvent.description
         })
       }
+      this.solveFlow(this.pickEvent.id, 1)
     },
     solveEvent() {
       if (this.pickEvent.action == 'roll') {
@@ -474,7 +581,7 @@ export default {
             id: nanoid(),
             messageType: 'choose',
             message: foundFlow.subFlowDescription,
-            optionList: JSON.parse(foundFlow.optionList)
+            optionList: foundFlow.optionList
           })
           break
         case 'end':
@@ -484,11 +591,36 @@ export default {
             message: foundFlow.subFlowDescription
           })
           this.eventSwitch = true
+          this.handleEffect(foundFlow)
           break
       }
     },
     solveChoose (subID) {
       this.solveFlow(this.pickEvent.id, subID)
+    },
+    handleEffect (effect = {statusEffect: {}, eventEffect: {}}) {
+      this.handleStatusEffect(effect.statusEffect)
+      this.handleEventEffect(effect.eventEffect)
+    },
+    handleStatusEffect (effect) {
+      _.forIn(effect, (val, key)=>{
+        this.$set(this.status, key, this.status[key] + val)
+      }) 
+    },
+    handleEventEffect (effect) {
+      _.forIn(effect, (val, key)=>{
+        switch (key) {
+          case 'immediate':
+            this.triggerEvent(val)
+            break
+          case 'add':
+          case 'remove':
+            break
+        }
+      })
+    },
+    handleToken () {
+
     },
     formatTime (timer) {
       return new Intl.NumberFormat().format(timer)
@@ -514,10 +646,64 @@ export default {
         if (++count % this.framerate == 0) {
           this.timer += 60
           this.actionPoint += 100
+          this.updateMarkerPrice()
         }
         requestAnimationFrame(tick)
       }
       requestAnimationFrame(tick)
+    },
+    updateMarkerPrice () {
+      let seed = _.random(-98,100)
+      this.price = _.round(this.price*(1+seed/10000), 4)
+      this.stock = _.round(this.stock*(1+seed/10000*this.leverage), 2)
+      if (this.stock < 0) this.stock = 0
+      this.second += 1
+      if (this.second >= 60) {
+        this.marketTime += 1
+        this.marketHistory.push({
+          time: Date.now(),
+          open: this.price,
+          close: this.price,
+          high: this.price,
+          low: this.price
+        })
+        this.second = 0
+      } else {
+        let marketNow = _.last(this.marketHistory)
+        marketNow.high < this.price ? marketNow.high = this.price : ''
+        marketNow.low > this.price ? marketNow.low = this.price : ''
+        marketNow.close = this.price
+      }
+      if (this.marketHistory.length > 60) this.marketHistory.unshift()
+    },
+    createGraph () {
+      this.stockGraph = new Stock('k-graph', {
+        data: this.marketHistory,
+        height: 200,
+        xField: 'time',
+        yField: ['open', 'close', 'high', 'low']
+      })
+      this.stockGraph.render()
+    },
+    stockBuy () {
+      if (_.isNumber(this.trade) && this.trade > 0) {
+        if (this.trade <= this.money) {
+          this.money -= this.trade
+          this.stock += this.trade
+        } else {
+          this.$message.warning('余额不足')
+        }
+      }
+    },
+    stockSell () {
+      if (_.isNumber(this.trade) && this.trade > 0) {
+        if (this.trade <= this.stock) {
+          this.stock -= this.trade
+          this.money += this.trade
+        } else {
+          this.$message.warning('持仓不足')
+        }
+      }
     },
     geneList (arrayA, arrayB, arrayC) {
       let resultList = []
@@ -535,6 +721,12 @@ export default {
 </script>
 
 <style lang="stylus" scoped>
+.main-heading
+  font-weight bold
+  font-size 32px
+  display inline-block
+  margin 8px 10px
+
 #content
   max-width 1280px
   min-width 480px
@@ -542,12 +734,15 @@ export default {
   .el-card
     text-align left
     margin-bottom 10px
-  #action-card, #event-card, #status-card
+  #action-card, #event-card, #status-card, #market-card
     height 284px
-  #skills-card, #story-card
+  #items-card, #story-card
     height 500px
-  #skill-card
+  #item-card
     height 435px
+  .card-header-button
+    float right
+    margin -3px 2px 0
   .event-switch, .action-switch
     float right
   .event-value
@@ -559,8 +754,12 @@ export default {
     overflow hidden
   .action-score
     margin 2px
-  .button-skill-action
+  .button-item-action
     float right
+  .price-now
+    font-size 12px
+    vertical-align sub
+    margin 0 4px
   .story-list
     height 436px
     margin 0
@@ -587,4 +786,8 @@ export default {
     width 148px
   #event-card .el-card__body
     padding-top 60px
+  #status-card .el-card__body
+    height 224px
+    overflow-y auto
+    padding 8px 16px
 </style>
