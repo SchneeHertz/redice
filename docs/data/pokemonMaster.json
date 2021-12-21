@@ -1,60 +1,69 @@
 {
-  "id": "5lingyQ90wnrYhf9ZAgB9",
-  "name": "成为口袋妖怪大师",
+  "id": "WCNAII7gt9EOYZSM67KYF",
+  "name": "目标! 口袋妖怪大师",
   "description": "来自真新镇的你，踏上了成为口袋妖怪大师的旅程",
-  "status": [
-    "输出",
-    "耐久",
-    "速度",
-    "干扰",
-    "回复",
-    "强化",
-    "电",
-    "火",
-    "冰",
-    "水",
-    "草",
-    "地",
-    "岩",
-    "钢",
-    "鬼",
-    "恶",
-    "虫",
-    "仙",
-    "飞",
-    "斗"
-  ],
+  "status": {
+    "输出": 0,
+    "耐久": 0,
+    "速度": 0,
+    "干扰": 0,
+    "回复": 0,
+    "强化": 0,
+    "电": 0,
+    "火": 0,
+    "冰": 0,
+    "水": 0,
+    "草": 0,
+    "地": 0,
+    "岩": 0,
+    "钢": 0,
+    "鬼": 0,
+    "恶": 0,
+    "虫": 0,
+    "仙": 0,
+    "飞": 0,
+    "斗": 0
+  },
+  "backpack": {
+    "pm": [],
+    "背包": []
+  },
   "column": 4,
   "itemList": [
     {
       "id": "40cM8KGa",
-      "name": "树枝",
-      "cat": "weapon",
-      "onetime": false,
-      "description": "你捡到一根树枝，它韧性很好，似乎很适合挥舞",
+      "name": "皮卡丘",
+      "onetime": true,
       "rare": 1,
       "nodes": [
         {
-          "icon": "sgii.png",
-          "x": "2",
+          "icon": "sgf.png",
+          "x": "1",
           "y": "3",
-          "id": "ALRY2QYe"
+          "id": "3RkJj-OL"
         },
         {
-          "icon": "sgg.png",
-          "x": "3",
+          "icon": "ygl.png",
+          "x": "2",
           "y": "2",
-          "id": "I022yKQn"
+          "id": "Lg7xe4x-"
+        },
+        {
+          "icon": "sgoz.png",
+          "x": "3",
+          "y": "1",
+          "id": "tDbTjtu-"
         }
       ],
-      "baseToken": "野外"
+      "eventEffect": {
+        "immediate": "皮卡丘"
+      }
     }
   ],
   "eventList": [
     {
       "id": "6W7WGZDd",
       "event": "遭遇史莱姆",
-      "cat": "monster",
       "description": "一只史莱姆从路边跳了出来",
       "rare": 1,
       "icon": "bgs.png",
@@ -66,9 +75,7 @@
       "success": "史莱姆A无视了你，继续朝旁边跳去",
       "fail": "史莱姆A朝你跳了过来",
       "failRedirect": 2,
-      "baseToken": [
-        "野外"
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
@@ -80,9 +87,7 @@
       "successRedirect": 3,
       "fail": "你拿起了武器",
       "failRedirect": 4,
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
@@ -90,9 +95,7 @@
       "subFlowDescription": "你选择",
       "action": "choose",
       "optionList": "[{\"label\": \"空手应战\", \"redirect\": 5}, {\"label\": \"跳向一边\", \"redirect\": 6}]",
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
@@ -105,9 +108,7 @@
       "successRedirect": 8,
       "fail": "你打空了",
       "failRedirect": 7,
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
@@ -120,36 +121,28 @@
       "successRedirect": 9,
       "fail": "你打空了",
       "failRedirect": 7,
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
       "subID": 6,
       "subFlowDescription": "史莱姆A的目标似乎不是你，它继续往前跳，离你越来越远，直到在你的视野中消失",
       "action": "end",
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
       "subID": 7,
       "subFlowDescription": "史莱姆A继续向你背后的反向跳，离你越来越远，直到在你的视野中消失",
       "action": "end",
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
       "subID": 8,
       "subFlowDescription": "地上留下了一滩粘液，你没有找到其他有价值的东西",
       "action": "end",
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     },
     {
       "id": "6W7WGZDd",
@@ -157,9 +150,7 @@
       "subFlowDescription": "你手上沾了一些史莱姆的体液，你感觉皮肤有些微微发热，于是你就近找了一些干树叶，把粘液擦掉了",
       "action": "end",
       "addToken": "史莱姆A的印记",
-      "baseToken": [
-        ""
-      ]
+      "baseToken": []
     }
   ]
 }

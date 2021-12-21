@@ -1,8 +1,8 @@
 <template>
   <div>
     <transition :name="fadeType">
-      <img :src="eventImage1st" v-if="trigger" key="on" class="event-icon" @click="log('1st')" :style="{margin: iconMargin}"/>
-      <img :src="eventImage2nd" v-else key="off" class="event-icon" @click="log('2nd')" :style="{margin: iconMargin}"/>
+      <img :src="eventImage1st" v-if="trigger" key="on" class="event-icon" :style="{margin: iconMargin}"/>
+      <img :src="eventImage2nd" v-else key="off" class="event-icon" :style="{margin: iconMargin}"/>
     </transition>
     <img :src="imageBlock" class="event-icon-block" :style="{margin: iconMargin}"/>
   </div>
@@ -33,9 +33,6 @@ export default {
     }
   },
   methods: {
-    log (str) {
-      console.log(str)
-    },
     fastRoundEvent () {
       let count = 0
       let frameRate = 6
