@@ -81,7 +81,7 @@
         <el-col :lg="9" :sm="24">
           <el-card id="market-card" v-show="displayMarket">
             <template #header>
-              <span>市场 ({{money}};{{stock}})</span>
+              <span>市场 ({{money}};{{stock}})</span><span :style="{color: revenueRatio > 0 ? 'red' : 'green'}">({{Math.round(revenueRatio*100)}}%)</span>
               <el-button class="card-header-button" type="primary" size="mini" plain>购买一组扭蛋</el-button>
               <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">切换到状态</el-button>
             </template>
@@ -98,7 +98,7 @@
                 </el-input>
               </el-col>
               <el-col :span="5">
-                <el-select v-model="leverage" placeholder="杠杆" size="mini">
+                <el-select v-model="leverage" placeholder="杠杆" size="mini" @change="updateLeverage">
                   <el-option
                     v-for="item in leverageOption"
                     :key="item.value"
@@ -255,7 +255,6 @@ export default {
         low: 1,
         time: Date.now()
       }],
-      marketTime: 1,
       second: 0,
       price: 1,
       leverage: 1,
@@ -276,7 +275,10 @@ export default {
         value: 100
       }],
       stock: 0,
-      stockGraph: undefined
+      hands: 0,
+      revenueRatio: 0,
+      stockGraph: undefined,
+      worker: undefined
     }
   },
   computed: {
@@ -392,9 +394,6 @@ export default {
       key: nanoid(8),
       ...this.pickIcon()
     }))
-    setInterval(()=>{
-      this.money += 1
-    }, 1000)
     this.createGraph()
     setInterval(()=>{
       this.stockGraph.update({
@@ -422,6 +421,19 @@ export default {
     .catch(()=>{
       this.$router.push('/')
     })
+    this.worker = new Worker('/redice/stock.worker.js')
+    this.worker.onmessage = (event)=>{
+      let {money, price, stock, hands, marketHistory, revenueRatio} = event.data
+      this.money = money
+      this.price = price
+      this.stock = stock
+      this.hands = hands
+      this.marketHistory = marketHistory
+      this.revenueRatio = revenueRatio
+    }
+  },
+  beforeDestroy () {
+    this.worker.terminate()
   },
   methods: {
     talk (remarks = [], delay = 2000) {
@@ -471,10 +483,8 @@ export default {
       if (item.activeAction.length == item.nodes.length) {
         if (item.onetime) this.chosenItemList.push(id)
         this.existActionList = _.without(this.existActionList, ...item.activeAction)
-        this.handleEffect(_.pick(item, ['statusEffect', 'eventEffect']))
-        if (item.addToken) {
-          this.itemToken = _([...this.itemToken, ...item.addToken]).uniq().compact().value()
-        }
+        this.handleEffect(item)
+        this.handleToken('itemToken', item)
         // if (['backpack'].includes(item.cat)) {
         //   this.backpack.push(item.name)
         // }
@@ -592,6 +602,7 @@ export default {
           })
           this.eventSwitch = true
           this.handleEffect(foundFlow)
+          this.handleToken('eventToken', foundFlow)
           break
       }
     },
@@ -619,7 +630,11 @@ export default {
         }
       })
     },
-    handleToken () {
+    handleToken (cat = 'eventToken', effect = { addToken: [], removeToken: []}) {
+      this[cat] = _([...this[cat], ...effect.addToken]).uniq().compact().value()
+      this[cat] = _.filter(this[cat], t=>!effect.removeToken.includes(t))
+    },
+    handleItem () {
 
     },
     formatTime (timer) {
@@ -645,36 +660,11 @@ export default {
       let tick = () => {
         if (++count % this.framerate == 0) {
           this.timer += 60
-          this.actionPoint += 100
-          this.updateMarkerPrice()
+          this.actionPoint += 20
         }
         requestAnimationFrame(tick)
       }
       requestAnimationFrame(tick)
-    },
-    updateMarkerPrice () {
-      let seed = _.random(-98,100)
-      this.price = _.round(this.price*(1+seed/10000), 4)
-      this.stock = _.round(this.stock*(1+seed/10000*this.leverage), 2)
-      if (this.stock < 0) this.stock = 0
-      this.second += 1
-      if (this.second >= 60) {
-        this.marketTime += 1
-        this.marketHistory.push({
-          time: Date.now(),
-          open: this.price,
-          close: this.price,
-          high: this.price,
-          low: this.price
-        })
-        this.second = 0
-      } else {
-        let marketNow = _.last(this.marketHistory)
-        marketNow.high < this.price ? marketNow.high = this.price : ''
-        marketNow.low > this.price ? marketNow.low = this.price : ''
-        marketNow.close = this.price
-      }
-      if (this.marketHistory.length > 60) this.marketHistory.unshift()
     },
     createGraph () {
       this.stockGraph = new Stock('k-graph', {
@@ -686,24 +676,27 @@ export default {
       this.stockGraph.render()
     },
     stockBuy () {
-      if (_.isNumber(this.trade) && this.trade > 0) {
+      if (_.isNumber(this.trade) && this.trade >= 0) {
         if (this.trade <= this.money) {
           this.money -= this.trade
-          this.stock += this.trade
+          this.worker.postMessage(['buy', this.trade, this.leverage])
         } else {
           this.$message.warning('余额不足')
         }
       }
     },
     stockSell () {
-      if (_.isNumber(this.trade) && this.trade > 0) {
+      if (_.isNumber(this.trade) && this.trade >= 0) {
         if (this.trade <= this.stock) {
           this.stock -= this.trade
-          this.money += this.trade
+          this.worker.postMessage(['sell', this.trade, this.leverage])
         } else {
           this.$message.warning('持仓不足')
         }
       }
+    },
+    updateLeverage (leverage) {
+      this.worker.postMessage(['sell', 0, leverage])
     },
     geneList (arrayA, arrayB, arrayC) {
       let resultList = []

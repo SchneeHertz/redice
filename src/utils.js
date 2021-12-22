@@ -27,13 +27,19 @@ const {nanoid} = require('nanoid')
                       n.id = nanoid(8)
                       return n
                     })
-      item.eventEffect = JSON.parse(item.eventEffect)
-      item.status
+      item.baseToken = _(item.baseToken).split(',').compact().value()
+      item.addToken = _(item.addToken).split(',').compact().value()
+      item.removeToken = _(item.removeToken).split(',').compact().value()
+      item.eventEffect = JSON.parse(item.eventEffect || '{}')
+      item.statusEffect = JSON.parse(item.statusEffect || '{}')
+      item.item = JSON.parse(item.item || '{}')
     })
     let eventList = XLSX.utils.sheet_to_json(workbook.Sheets['event'])
     _.forIn(eventList, event=>{
       if (event.icon) event.icon = event.icon + '.webp'
       event.baseToken = _(event.baseToken).split(',').compact().value()
+      event.addToken = _(event.addToken).split(',').compact().value()
+      event.removeToken = _(event.removeToken).split(',').compact().value()
       event.statusEffect = JSON.parse(event.statusEffect || '{}')
       event.eventEffect = JSON.parse(event.eventEffect || '{}')
       event.item = JSON.parse(event.item || '{}')

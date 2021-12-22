@@ -1,5 +1,5 @@
 {
-  "id": "84w7yftUakOVVu31cFU8P",
+  "id": "K5R81Cemjl_DCUMKabPY7",
   "name": "目标! 口袋妖怪大师",
   "description": "来自真新镇的你，踏上了成为口袋妖怪大师的旅程",
   "status": {
@@ -40,25 +40,29 @@
           "icon": "sgf.webp",
           "x": "1",
           "y": "3",
-          "id": "njCYnemB"
+          "id": "7-DpA5D8"
         },
         {
           "icon": "ygl.webp",
           "x": "2",
           "y": "2",
-          "id": "E296klH3"
+          "id": "1-OmzCFk"
         },
         {
           "icon": "sgoz.webp",
           "x": "3",
           "y": "1",
-          "id": "05MnKOcm"
+          "id": "OBijM5mn"
         }
       ],
       "eventEffect": {
         "immediate": "皮卡丘"
       },
-      "addToken": "pm"
+      "baseToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "item": {}
     }
   ],
   "eventList": [
@@ -85,6 +89,8 @@
       "baseToken": [
         "trigger"
       ],
+      "addToken": [],
+      "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
       "item": {}
@@ -101,6 +107,8 @@
       "fail": "可惜，收服失败",
       "failRedirect": 5,
       "baseToken": [],
+      "addToken": [],
+      "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
       "item": {},
@@ -112,6 +120,8 @@
       "subFlowDescription": "你离开了现场",
       "action": "end",
       "baseToken": [],
+      "addToken": [],
+      "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
       "item": {},
@@ -129,8 +139,11 @@
       "item": {
         "pm": "皮卡丘"
       },
-      "addToken": "pm",
+      "addToken": [
+        "pm"
+      ],
       "baseToken": [],
+      "removeToken": [],
       "eventEffect": {},
       "optionList": []
     },
@@ -145,6 +158,8 @@
       "fail": "皮卡丘逃走了",
       "failRedirect": 3,
       "baseToken": [],
+      "addToken": [],
+      "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
       "item": {},
