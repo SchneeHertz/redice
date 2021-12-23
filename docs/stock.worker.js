@@ -39,7 +39,7 @@ const updateMarkerPrice = () => {
     marketNow.low > price ? marketNow.low = price : ''
     marketNow.close = price
   }
-  if (marketHistory.length > 60) marketHistory.unshift()
+  if (marketHistory.length > 60) marketHistory.shift()
 }
 
 const stockBuy = (trade) => {
@@ -65,12 +65,15 @@ onmessage = (event)=>{
       leverage = lr
       stockSell(trade)
       break
+    case 'spend':
+      money -= trade
+      break
   }
 }
 
 setInterval(()=>{
   time += 1
-  money += 1
+  money += 1000
   updateMarkerPrice()
   postMessage({
     money,
