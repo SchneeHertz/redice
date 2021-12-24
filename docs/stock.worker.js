@@ -73,7 +73,7 @@ onmessage = (event)=>{
 
 setInterval(()=>{
   time += 1
-  money += 1000
+  money += 1
   updateMarkerPrice()
   postMessage({
     money,

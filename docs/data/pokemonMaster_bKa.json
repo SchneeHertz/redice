@@ -1,15 +1,15 @@
 {
-  "id": "K5R81Cemjl_DCUMKabPY7",
-  "name": "目标! 口袋妖怪大师",
-  "description": "来自真新镇的你，踏上了成为口袋妖怪大师的旅程",
+  "id": "OM8bZXu81RXYc0R5gT7MA",
+  "name": "目标! 宝可梦大师",
+  "description": "来自真新镇的你，踏上了成为宝可梦大师的旅程",
   "status": {
     "输出": 0,
     "耐久": 0,
-    "速度": 0,
+    "速度": 1,
     "干扰": 0,
     "回复": 0,
     "捕获": 0,
-    "电": 0,
+    "电": 1,
     "火": 0,
     "冰": 0,
     "水": 0,
@@ -25,10 +25,22 @@
     "斗": 0
   },
   "backpack": {
-    "pm": [],
-    "背包": []
+    "pm": [
+      "皮卡丘"
+    ],
+    "背包": [
+      "精灵球"
+    ]
   },
   "column": 4,
+  "opening": [
+    "你是一名宝可梦训练家",
+    "今年你已经成年，是时候离开家，踏上旅程了",
+    "去收服不同的宝可梦",
+    "去邂逅许多的人和事",
+    "去挑战强大的道馆馆主",
+    "实现自己的梦想，成为宝可梦大师吧"
+  ],
   "itemList": [
     {
       "id": "40cM8KGa",
@@ -40,19 +52,19 @@
           "icon": "sgf.webp",
           "x": "1",
           "y": "3",
-          "id": "7-DpA5D8"
+          "id": "nXxSM030"
         },
         {
           "icon": "ygl.webp",
           "x": "2",
           "y": "2",
-          "id": "1-OmzCFk"
+          "id": "Hku4UWl2"
         },
         {
           "icon": "sgoz.webp",
           "x": "3",
           "y": "1",
-          "id": "OBijM5mn"
+          "id": "B1jSlpGS"
         }
       ],
       "eventEffect": {
@@ -62,7 +74,7 @@
       "addToken": [],
       "removeToken": [],
       "statusEffect": {},
-      "item": {}
+      "item": []
     }
   ],
   "eventList": [
@@ -93,7 +105,7 @@
       "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
-      "item": {}
+      "item": []
     },
     {
       "id": "6W7WGZDd",
@@ -111,20 +123,20 @@
       "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
-      "item": {},
+      "item": [],
       "optionList": []
     },
     {
       "id": "6W7WGZDd",
       "subID": 3,
-      "subFlowDescription": "你离开了现场",
+      "subFlowDescription": "你逃跑了",
       "action": "end",
       "baseToken": [],
       "addToken": [],
       "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
-      "item": {},
+      "item": [],
       "optionList": []
     },
     {
@@ -136,13 +148,15 @@
         "电": 1,
         "速度": 1
       },
-      "item": {
-        "pm": "皮卡丘"
-      },
-      "addToken": [
-        "pm"
+      "item": [
+        {
+          "backpack": "pm",
+          "action": "add",
+          "name": "皮神"
+        }
       ],
       "baseToken": [],
+      "addToken": [],
       "removeToken": [],
       "eventEffect": {},
       "optionList": []
@@ -162,7 +176,7 @@
       "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
-      "item": {},
+      "item": [],
       "optionList": []
     }
   ]
