@@ -13,11 +13,12 @@ const {nanoid} = require('nanoid')
     let workbook = XLSX.readFile(path.resolve(__dirname, '../data', file))
     let paramData = XLSX.utils.sheet_to_json(workbook.Sheets['param'])
     let status = _.assign({}, ..._(paramData).map(e=>(e.status?{[e.status]: e.initValue}:{})).value())
-    let backpack = _.assign({}, ..._(paramData).map(e=>(e.backpack?{[e.backpack]: []}:{})).value())
+    let backpack = _.assign({}, ..._(paramData).map(e=>(e.backpack?{[e.backpack]: _(e.initBackpack).split(',').compact().value()}:{})).value())
     let column = _.get(paramData[0], 'column')
     let name = _.get(paramData[0], 'name')
     let filename = _.get(paramData[0], 'filename') + '_' + nanoid(3)
     let description = _.get(paramData[0], 'description')
+    let opening = _(paramData).map(e=>e.opening).compact().value()
     let itemList = XLSX.utils.sheet_to_json(workbook.Sheets['item'])
     _.forIn(itemList, item=>{
       item.nodes = _.split(item.nodes, '|')
@@ -32,7 +33,7 @@ const {nanoid} = require('nanoid')
       item.removeToken = _(item.removeToken).split(',').compact().value()
       item.eventEffect = JSON.parse(item.eventEffect || '{}')
       item.statusEffect = JSON.parse(item.statusEffect || '{}')
-      item.item = JSON.parse(item.item || '{}')
+      item.item = JSON.parse(item.item || '[]')
     })
     let eventList = XLSX.utils.sheet_to_json(workbook.Sheets['event'])
     _.forIn(eventList, event=>{
@@ -42,7 +43,7 @@ const {nanoid} = require('nanoid')
       event.removeToken = _(event.removeToken).split(',').compact().value()
       event.statusEffect = JSON.parse(event.statusEffect || '{}')
       event.eventEffect = JSON.parse(event.eventEffect || '{}')
-      event.item = JSON.parse(event.item || '{}')
+      event.item = JSON.parse(event.item || '[]')
       event.optionList = JSON.parse(event.optionList || '[]')
     })
     let id = nanoid()
@@ -59,6 +60,7 @@ const {nanoid} = require('nanoid')
       status,
       backpack,
       column,
+      opening,
       itemList,
       eventList
     }, null, "  "))

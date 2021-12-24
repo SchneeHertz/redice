@@ -4,7 +4,7 @@
     <el-card id="content">
       <el-row :gutter="10" id="card-row">
         <el-col :lg="8" :sm="24">
-          <el-card id="action-card">
+          <el-card id="action-card" :class="{isBright: brightAction > 0}">
             <template #header>
               <span>扭蛋</span>
               <el-switch v-model="actionLock" class="action-switch" :disabled="disableActionSwitch"/>
@@ -44,7 +44,7 @@
         <el-col :lg="7" :sm="24">
           <el-card id="event-card">
             <template #header>
-              <span>事件</span>
+              <span>随机事件</span>
               <el-switch v-model="eventLock" class="event-switch" :disabled="disableEventSwitch"/>
             </template>
             <el-row class="icon-warp">
@@ -82,8 +82,8 @@
           <el-card id="market-card" v-show="displayMarket">
             <template #header>
               <span>市场 ({{money}};{{stock}})</span><span :style="{color: revenueRatio > 0 ? 'red' : 'green'}">({{Math.round(revenueRatio*100)}}%)</span>
-              <el-button class="card-header-button" type="primary" size="mini" plain>购买一组扭蛋</el-button>
-              <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">切换到状态</el-button>
+              <el-button class="card-header-button" type="primary" size="mini" plain @click="openStore">购买扭蛋</el-button>
+              <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">状态</el-button>
             </template>
             <el-row>
               <el-col :span="5">
@@ -113,13 +113,13 @@
           <el-card id="status-card" v-show="!displayMarket">
             <template #header>
               <span>状态</span>
-              <el-button class="card-header-button" type="primary" size="mini" plain>购买一组扭蛋</el-button>
-              <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">切换到市场</el-button>
+              <el-button class="card-header-button" type="primary" size="mini" plain @click="openStore">购买扭蛋</el-button>
+              <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">市场</el-button>
             </template>
             <el-descriptions :column="3" size="mini">
               <el-descriptions-item label="动作点">{{actionPoint}}</el-descriptions-item>
               <el-descriptions-item label="事件点">{{eventPoint}}</el-descriptions-item>
-              <el-descriptions-item label="余额">{{money}}</el-descriptions-item>
+              <el-descriptions-item label="代币">{{money}}</el-descriptions-item>
             </el-descriptions>
             <el-descriptions :column="descriptionColumn" size="mini">
               <el-descriptions-item 
@@ -156,6 +156,7 @@
                   :nodes="item.nodes"
                   :activeAction="item.activeAction"
                   @choose="chooseItem(item.id)"
+                  class="item-graph"
                 />
                 <div class="button-item-action">
                   <el-button type="success" size="mini" icon="el-icon-check" plain round @click="chooseItem(item.id)"></el-button>
@@ -182,16 +183,12 @@
           </el-card>
         </el-col>
       </el-row>
-      <!-- <div class="timer">时间 {{formatTime(timer)}} 天</div> -->
     </el-card>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-// import itemList from '@/assets/itemList.json'
-// import eventList from '@/assets/eventList.json'
-// import scriptData from '@/assets/scriptData.json'
 import _ from 'lodash'
 import Roll from '@/components/roll.vue'
 import Item from '@/components/item.vue'
@@ -229,6 +226,7 @@ export default {
       disableEventSwitch: true,
       actionLock: true,
       eventLock: true,
+      brightAction: 0,
       existActionList: ['sgf.webp', 'sgoz.webp', 'ygl.webp'],
       actionShowList: [],
       eventShow: 'rbgk.webp',
@@ -238,7 +236,7 @@ export default {
       eventPoint: 0,
       descriptionColumn: 3,
       status: {},
-      backpack: [],
+      backpack: {},
       itemToken: [],
       eventToken: [],
       pickEvent: undefined,
@@ -310,7 +308,7 @@ export default {
       })
     },
     displayStoryList () {
-      return _.take(this.storyList, 30)
+      return _.take(this.storyList, 100)
     }
   },
   watch: {
@@ -318,11 +316,20 @@ export default {
       if (val >= 1200 && this.actionSwitch && this.actionLock) {
         this.actionSwitch = false
         this.actionPoint -= 1200
-        this.actionShowList = _.fill(Array(8), 0).map(()=>({
-          show: true,
-          key: nanoid(8),
-          ...this.pickIcon()
-        }))
+        if (this.brightAction > 0) {
+          this.actionShowList = _.fill(Array(8), 0).map(()=>({
+            show: true,
+            key: nanoid(8),
+            ...this.pickIcon(true)
+          }))
+          this.brightAction -= 1
+        } else {
+          this.actionShowList = _.fill(Array(8), 0).map(()=>({
+            show: true,
+            key: nanoid(8),
+            ...this.pickIcon()
+          }))
+        }
         for (let i=0; i<8; i++) {
           if (i !== 7) {
             setTimeout(()=>{
@@ -361,7 +368,25 @@ export default {
               })
               this.$refs.eventresultroll.roundEvent()
               setTimeout(()=>{
-                this.solveEvent()
+                if (this.eventRolled >= this.eventValue) {
+                  this.storyList.unshift({
+                    id: nanoid(),
+                    messageType: 'message',
+                    message: this.pickEvent.success
+                  })
+                  setTimeout(()=>{
+                    this.solveFlow(this.pickEvent.id, this.pickEvent.successRedirect)
+                  }, 1000)
+                } else {
+                  this.storyList.unshift({
+                    id: nanoid(),
+                    messageType: 'message',
+                    message: this.pickEvent.fail
+                  })
+                  setTimeout(()=>{
+                    this.solveFlow(this.pickEvent.id, this.pickEvent.failRedirect)
+                  }, 1000)
+                }
               }, 4500)
             }, 4500)
           }, 1000)
@@ -376,7 +401,7 @@ export default {
                 messageType: 'message',
                 message: this.pickEvent.description
               })
-              this.solveEvent()
+              this.solveFlow(this.pickEvent.id, 1)
             }, 4500)
           }, 1000)
         }
@@ -411,6 +436,7 @@ export default {
       this.status = scriptData.status
       this.subHeading = scriptData.name
       this.backpack = scriptData.backpack
+      this.talk(scriptData.opening)
 
       this.prePickEventList = _.filter(this.eventList, event=>_.has(event, 'icon'))
 
@@ -437,12 +463,6 @@ export default {
   },
   methods: {
     talk (remarks = [], delay = 2000) {
-      remarks = _.cloneDeep(remarks)
-      this.storyList.unshift({
-        id: nanoid(),
-        messageType: 'message',
-        message: remarks.shift()
-      })
       if (remarks.length > 0){
         setTimeout(()=>{
           this.storyList.unshift({
@@ -450,21 +470,48 @@ export default {
             messageType: 'message',
             message: remarks.shift()
           })
-          this.talk(remarks)
+          this.talk(remarks, delay)
         }, delay)
       }
     },
-    pickIcon (colorList = [
+    pickIcon (bright, colorList = [
       {color: 'rb', ratio: 98, value: 500},
       {color: 'y', ratio: 80, value: 100},
       {color: 's', ratio: 0, value: 10}
       ], type = 'g', letters = this.letters) {
-      let seed = _.random(1,100)
-      let letter = _.sample(letters)
-      let foundInColor = _.find(colorList, c=>seed > c.ratio)
-      return {
-        icon: `${foundInColor.color}${type}${letter}.webp`,
-        value: foundInColor.value
+      if (bright) {
+        let icon = _.sample(_.without(this.action_icons, ...this.existActionList))
+        if (!icon) {
+          return {
+            icon: 'rbgoz.webp',
+            value: 500
+          }
+        } else {
+          let value
+          switch (icon[0]) {
+            case 'r':
+              value = 500
+              break
+            case 'y':
+              value = 100
+              break
+            case 's':
+              value = 10
+              break
+          }
+          return {
+            icon,
+            value
+          }
+        }
+      } else {
+        let seed = _.random(1,100)
+        let letter = _.sample(letters)
+        let foundInColor = _.find(colorList, c=>seed > c.ratio)
+        return {
+          icon: `${foundInColor.color}${type}${letter}.webp`,
+          value: foundInColor.value
+        }
       }
     },
     convertActionPoint () {
@@ -475,7 +522,7 @@ export default {
         } else {
           this.existActionList.push(action.icon)
         }
-        this.eventPoint += 50
+        this.eventPoint += 25
       })
     },
     chooseItem (id) {
@@ -485,6 +532,7 @@ export default {
         this.existActionList = _.without(this.existActionList, ...item.activeAction)
         this.handleEffect(item)
         this.handleToken('itemToken', item)
+        this.handleItem(item)
         // if (['backpack'].includes(item.cat)) {
         //   this.backpack.push(item.name)
         // }
@@ -507,31 +555,6 @@ export default {
         })
       }
       this.solveFlow(this.pickEvent.id, 1)
-    },
-    solveEvent() {
-      if (this.pickEvent.action == 'roll') {
-        if (this.eventRolled >= this.eventValue) {
-          this.storyList.unshift({
-            id: nanoid(),
-            messageType: 'message',
-            message: this.pickEvent.success
-          })
-          setTimeout(()=>{
-            this.solveFlow(this.pickEvent.id, this.pickEvent.successRedirect)
-          }, 1000)
-        } else {
-          this.storyList.unshift({
-            id: nanoid(),
-            messageType: 'message',
-            message: this.pickEvent.fail
-          })
-          setTimeout(()=>{
-            this.solveFlow(this.pickEvent.id, this.pickEvent.failRedirect)
-          }, 1000)
-        }
-      } else {
-
-      }
     },
     solveFlow (id, subID) {
       if (!_.isNumber(subID)) return false
@@ -603,6 +626,7 @@ export default {
           this.eventSwitch = true
           this.handleEffect(foundFlow)
           this.handleToken('eventToken', foundFlow)
+          this.handleItem(foundFlow)
           break
       }
     },
@@ -634,11 +658,17 @@ export default {
       this[cat] = _([...this[cat], ...effect.addToken]).uniq().compact().value()
       this[cat] = _.filter(this[cat], t=>!effect.removeToken.includes(t))
     },
-    handleItem () {
-
-    },
-    formatTime (timer) {
-      return new Intl.NumberFormat().format(timer)
+    handleItem (effect = {item: []}) {
+      _.forIn(effect.item, item=>{
+        switch (item.action) {
+          case 'add':
+            this.backpack[item.backpack] = _.uniq([...this.backpack[item.backpack], item.name])
+            break
+          case 'remove':
+            this.backpack[item.backpack] = _.filter(this.backpack[item.backpack], i=>i != item.name)
+            break
+        }
+      })
     },
     caculateFramerate () {
       let count = 0
@@ -681,7 +711,7 @@ export default {
           this.money -= this.trade
           this.worker.postMessage(['buy', this.trade, this.leverage])
         } else {
-          this.$message.warning('余额不足')
+          this.$message.warning('代币不足')
         }
       }
     },
@@ -697,6 +727,36 @@ export default {
     },
     updateLeverage (leverage) {
       this.worker.postMessage(['sell', 0, leverage])
+    },
+    openStore () {
+      this.$confirm('消耗代币购买动作点和闪光次数', '商店', {
+        distinguishCancelAndClose: true,
+        center: true,
+        confirmButtonText: '1000代币/1闪光次数',
+        cancelButtonText: '50代币/1200动作点',
+        beforeClose: (action, instance, done)=>{
+          if (action === 'close') {
+            done()
+          } else if (action === 'cancel') {
+            if (this.money > 50) {
+              this.actionPoint +=1200
+              this.money -= 50
+              this.worker.postMessage(['spend', 50])
+            } else {
+              this.$message.warning('代币不足')
+            }
+          } else {
+            if (this.money > 1000) {
+              this.brightAction += 1
+              this.money -= 1000
+              this.worker.postMessage(['spend', 1000])
+            } else {
+              this.$message.warning('代币不足')
+            }
+          }
+        }
+      })
+      .catch(()=>{})
     },
     geneList (arrayA, arrayB, arrayC) {
       let resultList = []
@@ -733,6 +793,8 @@ export default {
     height 500px
   #item-card
     height 435px
+  #action-card.isBright
+    box-shadow 0 0 4px 4px rgba(0,127,255,0.4)
   .card-header-button
     float right
     margin -3px 2px 0
@@ -747,6 +809,8 @@ export default {
     overflow hidden
   .action-score
     margin 2px
+  .item-graph
+    overflow-x auto
   .button-item-action
     float right
   .price-now
@@ -774,7 +838,7 @@ export default {
   .el-card__body
     padding 10px
   .el-card__header
-    padding 10px 20px
+    padding 10px 10px 10px 16px
   .el-tabs__header.is-left
     width 148px
   #event-card .el-card__body
