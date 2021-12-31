@@ -117,7 +117,7 @@
               <el-button class="card-header-button" type="primary" size="mini" plain @click="displayMarket = !displayMarket">市场</el-button>
             </template>
             <el-descriptions :column="3" size="mini">
-              <el-descriptions-item label="动作点">{{actionPoint}}</el-descriptions-item>
+              <el-descriptions-item label="行动点">{{actionPoint}}</el-descriptions-item>
               <el-descriptions-item label="事件点">{{eventPoint}}</el-descriptions-item>
               <el-descriptions-item label="代币">{{money}}</el-descriptions-item>
             </el-descriptions>
@@ -160,7 +160,9 @@
                 />
                 <div class="button-item-action">
                   <el-button type="success" size="mini" icon="el-icon-check" plain round @click="chooseItem(item.id)"></el-button>
-                  <el-button type="danger" size="mini" icon="el-icon-delete" plain round></el-button>
+                  <el-tooltip effect="dark" content="回收事件可以获得行动点" placement="top">
+                    <el-button type="danger" size="mini" icon="el-icon-delete" plain round @click="recycleItem(item.id)"></el-button>
+                  </el-tooltip>
                 </div>
               </el-tab-pane>
             </el-tabs>
@@ -232,7 +234,7 @@ export default {
       eventShow: 'rbgk.webp',
       eventValue: 9,
       eventRolled: 6,
-      actionPoint: 3000,
+      actionPointValue: 0,
       eventPoint: 0,
       descriptionColumn: 3,
       status: {},
@@ -260,6 +262,9 @@ export default {
         label: '1x',
         value: 1
       }, {
+        label: '2x',
+        value: 2
+      }, {
         label: '5x',
         value: 5
       }, {
@@ -280,6 +285,15 @@ export default {
     }
   },
   computed: {
+    actionPoint: {
+      get () {
+        return this.actionPointValue
+      },
+      set (val) {
+        this.actionPointValue = val
+        this.worker.postMessage(['action', val])
+      }
+    },
     actionShowList1 () {
       return this.actionShowList.slice(0, 4)
     },
@@ -449,13 +463,14 @@ export default {
     })
     this.worker = new Worker('/redice/stock.worker.js')
     this.worker.onmessage = (event)=>{
-      let {money, price, stock, hands, marketHistory, revenueRatio} = event.data
+      let {money, price, stock, hands, marketHistory, revenueRatio, actionPoint} = event.data
       this.money = money
       this.price = price
       this.stock = stock
       this.hands = hands
       this.marketHistory = marketHistory
       this.revenueRatio = revenueRatio
+      this.actionPoint = actionPoint
     }
   },
   beforeDestroy () {
@@ -543,6 +558,25 @@ export default {
             message: item.description
           })
         }
+      }
+    },
+    recycleItem (id) {
+      let item = _.find(this.displayItemList, {id: id})
+      if (item.activeAction.length == item.nodes.length) {
+        _.forIn(item.activeAction, icon=>{
+          switch (icon[0]) {
+            case 'r':
+              this.actionPoint += 5000
+              break
+            case 'y':
+              this.actionPoint += 1000
+              break
+            case 's':
+              this.actionPoint += 100
+              break
+          }
+        })
+        this.existActionList = _.without(this.existActionList, ...item.activeAction)
       }
     },
     triggerEvent (name) {
@@ -686,15 +720,15 @@ export default {
       requestAnimationFrame(tick)
     },
     timeFlow () {
-      let count = 0
-      let tick = () => {
-        if (++count % this.framerate == 0) {
-          this.timer += 60
-          this.actionPoint += 20
-        }
-        requestAnimationFrame(tick)
-      }
-      requestAnimationFrame(tick)
+      // let count = 0
+      // let tick = () => {
+      //   if (++count % this.framerate == 0) {
+      //     this.timer += 60
+      //     this.actionPoint += 20
+      //   }
+      //   requestAnimationFrame(tick)
+      // }
+      // requestAnimationFrame(tick)
     },
     createGraph () {
       this.stockGraph = new Stock('k-graph', {
@@ -729,11 +763,11 @@ export default {
       this.worker.postMessage(['sell', 0, leverage])
     },
     openStore () {
-      this.$confirm('消耗代币购买动作点和闪光次数', '商店', {
+      this.$confirm('消耗代币购买行动点和闪光次数', '商店', {
         distinguishCancelAndClose: true,
         center: true,
         confirmButtonText: '1000代币/1闪光次数',
-        cancelButtonText: '50代币/1200动作点',
+        cancelButtonText: '50代币/1200行动点',
         beforeClose: (action, instance, done)=>{
           if (action === 'close') {
             done()
