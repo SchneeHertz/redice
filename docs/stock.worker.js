@@ -14,6 +14,8 @@ let marketHistory = [{
   low: 1,
   time: Date.now()
 }]
+let actionPoint = 3000
+let spendMoney = 0
 
 const updateMarkerPrice = () => {
   let seed = _.random(-98,100)
@@ -67,6 +69,10 @@ onmessage = (event)=>{
       break
     case 'spend':
       money -= trade
+      spendMoney += trade
+      break
+    case 'action':
+      actionPoint = trade
       break
   }
 }
@@ -74,6 +80,7 @@ onmessage = (event)=>{
 setInterval(()=>{
   time += 1
   money += 1
+  actionPoint += 20
   updateMarkerPrice()
   postMessage({
     money,
@@ -81,6 +88,7 @@ setInterval(()=>{
     stock,
     hands,
     marketHistory,
-    revenueRatio: _.round((money+stock) / time - 1, 4)
+    revenueRatio: _.round((money+stock-spendMoney) / time - 1, 4),
+    actionPoint
   })
 }, 1000)
