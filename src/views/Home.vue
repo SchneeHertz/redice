@@ -173,7 +173,8 @@
             <template #header>
               <span>故事</span>
             </template>
-            <ul class="story-list">
+            <!-- <ul class="story-list"> -->
+            <transition-group name="story" class="story-list" tag="ul">
               <Story
                 v-for="story in displayStoryList"
                 :key="story.id"
@@ -181,7 +182,8 @@
                 :numberIcon="number_icons"
                 @choose-subid="solveChoose"
               />
-            </ul>
+            </transition-group>
+            <!-- </ul> -->
           </el-card>
         </el-col>
       </el-row>
@@ -229,7 +231,7 @@ export default {
       actionLock: true,
       eventLock: true,
       brightAction: 0,
-      existActionList: ['sgf.webp', 'sgoz.webp', 'ygl.webp'],
+      existActionList: ['ygie.webp', 'ygoz.webp'],
       actionShowList: [],
       eventShow: 'rbgk.webp',
       eventValue: 9,
@@ -307,7 +309,8 @@ export default {
         return s
       })
       .filter(s=>{
-        return !(_.isEmpty(s.activeAction) || this.chosenItemList.includes(s.id))
+        return !_.isEmpty(s.activeAction) && !this.chosenItemList.includes(s.id)
+          && _.every(s.baseToken, t=>_.includes(this.tokenList, t)) && _.every(s.excludeToken, t=>!_.includes(this.tokenList, t))
       })
       .sortBy(s=>-s.activeAction.length / s.nodes.length)
       .value()
@@ -317,8 +320,7 @@ export default {
     },
     availableEventList () {
       return _.filter(this.prePickEventList, event=>{
-        if (!event.baseToken) event.baseToken = []
-        return _.every(event.baseToken, t=>_.includes(this.tokenList, t))
+        return _.every(event.baseToken, t=>_.includes(this.tokenList, t)) && _.every(event.excludeToken, t=>!_.includes(this.tokenList, t))
       })
     },
     displayStoryList () {
@@ -453,10 +455,6 @@ export default {
       this.talk(scriptData.opening)
 
       this.prePickEventList = _.filter(this.eventList, event=>_.has(event, 'icon'))
-
-      // test code
-      // this.eventToken.push('野外')
-      // this.talk(['1','2','3','4','5'])
     })
     .catch(()=>{
       this.$router.push('/')
@@ -548,9 +546,6 @@ export default {
         this.handleEffect(item)
         this.handleToken('itemToken', item)
         this.handleItem(item)
-        // if (['backpack'].includes(item.cat)) {
-        //   this.backpack.push(item.name)
-        // }
         if (!_.isEmpty(item.description)) {
           this.storyList.unshift({
             id: nanoid(),
@@ -763,7 +758,7 @@ export default {
       this.worker.postMessage(['sell', 0, leverage])
     },
     openStore () {
-      this.$confirm('消耗代币购买行动点和闪光次数', '商店', {
+      this.$confirm('消耗代币兑换行动点和闪光次数', '商店', {
         distinguishCancelAndClose: true,
         center: true,
         confirmButtonText: '1000代币/1闪光次数',
@@ -865,6 +860,9 @@ export default {
     transform translateY(-128px)
   .fast-fade-enter, .fast-fade-leave-active
     opacity 0.2
+
+  .story-move
+    transition transform 0.5s
 </style>
 
 <style lang="stylus">

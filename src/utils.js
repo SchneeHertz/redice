@@ -29,6 +29,7 @@ const {nanoid} = require('nanoid')
                       return n
                     })
       item.baseToken = _(item.baseToken).split(',').compact().value()
+      item.excludeToken = _(item.excludeToken).split(',').compact().value()
       item.addToken = _(item.addToken).split(',').compact().value()
       item.removeToken = _(item.removeToken).split(',').compact().value()
       item.eventEffect = JSON.parse(item.eventEffect || '{}')
@@ -39,6 +40,7 @@ const {nanoid} = require('nanoid')
     _.forIn(eventList, event=>{
       if (event.icon) event.icon = event.icon + '.webp'
       event.baseToken = _(event.baseToken).split(',').compact().value()
+      event.excludeToken = _(event.excludeToken).split(',').compact().value()
       event.addToken = _(event.addToken).split(',').compact().value()
       event.removeToken = _(event.removeToken).split(',').compact().value()
       event.statusEffect = JSON.parse(event.statusEffect || '{}')
