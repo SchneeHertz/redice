@@ -1,0 +1,434 @@
+{
+  "id": "xffsZ0g7S0uZsk6OSnKpf",
+  "name": "目标! 宝可梦大师",
+  "description": "来自真新镇的你，踏上了成为宝可梦大师的旅程",
+  "status": {
+    "输出": 0,
+    "耐久": 0,
+    "速度": 1,
+    "干扰": 0,
+    "回复": 0,
+    "捕获": 0,
+    "电": 1,
+    "火": 0,
+    "冰": 0,
+    "水": 0,
+    "草": 0,
+    "地": 0,
+    "岩": 0,
+    "钢": 0,
+    "鬼": 0,
+    "恶": 0,
+    "虫": 0,
+    "仙": 0,
+    "飞": 0,
+    "斗": 0
+  },
+  "backpack": {
+    "pm": [
+      "皮卡丘"
+    ],
+    "背包": [
+      "精灵球"
+    ]
+  },
+  "column": 4,
+  "opening": [
+    "你是一名宝可梦训练家",
+    "今年你已经成年，是时候离开家，踏上旅程了",
+    "去收服不同的宝可梦",
+    "去邂逅许多的人和事",
+    "去挑战强大的道馆馆主",
+    "实现自己的梦想，成为宝可梦大师吧"
+  ],
+  "itemList": [
+    {
+      "id": "40cM8KGa",
+      "name": "牛蛙君",
+      "onetime": false,
+      "rare": 1,
+      "nodes": [
+        {
+          "icon": "ygie.webp",
+          "x": "2",
+          "y": "2",
+          "id": "_uYdOyOu"
+        },
+        {
+          "icon": "ygoz.webp",
+          "x": "3",
+          "y": "2",
+          "id": "2zP5wRpC"
+        }
+      ],
+      "eventEffect": {
+        "immediate": "牛蛙君"
+      },
+      "excludeToken": [
+        "牛蛙君"
+      ],
+      "baseToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "item": []
+    },
+    {
+      "id": "98k68630",
+      "name": "杰尼龟喷壶",
+      "onetime": true,
+      "description": "你获得了限量版的杰尼龟喷壶",
+      "rare": 2,
+      "nodes": [
+        {
+          "icon": "ygoo.webp",
+          "x": "2",
+          "y": "2",
+          "id": "BhMYrWCo"
+        },
+        {
+          "icon": "rbgs.webp",
+          "x": "3",
+          "y": "2",
+          "id": "qJEOTvVz"
+        },
+        {
+          "icon": "sgr.webp",
+          "x": "2",
+          "y": "3",
+          "id": "pSGrR5kx"
+        },
+        {
+          "icon": "ygd.webp",
+          "x": "3",
+          "y": "3",
+          "id": "Aew3-WGs"
+        }
+      ],
+      "item": [
+        {
+          "backpack": "背包",
+          "action": "add",
+          "name": "杰尼龟喷壶"
+        }
+      ],
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "eventEffect": {},
+      "statusEffect": {}
+    },
+    {
+      "id": "14YfCKUE",
+      "name": "胡说树",
+      "onetime": false,
+      "rare": 2,
+      "nodes": [
+        {
+          "icon": "rbgps.webp",
+          "x": "2",
+          "y": "1",
+          "id": "014S-Vvn"
+        },
+        {
+          "icon": "ygf.webp",
+          "x": "2",
+          "y": "2",
+          "id": "xvesKqKb"
+        },
+        {
+          "icon": "ygg.webp",
+          "x": "2",
+          "y": "3",
+          "id": "8AU-3oiK"
+        }
+      ],
+      "eventEffect": {
+        "immediate": "胡说树"
+      },
+      "excludeToken": [
+        "胡说树"
+      ],
+      "baseToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "item": []
+    }
+  ],
+  "eventList": [
+    {
+      "id": "6W7WGZDd",
+      "name": "牛蛙君",
+      "description": "野生的牛蛙君出现了",
+      "onetime": false,
+      "rare": 1,
+      "icon": "bga.webp",
+      "subID": 1,
+      "subFlowDescription": "你选择",
+      "action": "choose",
+      "optionList": [
+        {
+          "label": "投出精灵球",
+          "redirect": 2
+        },
+        {
+          "label": "什么也不做",
+          "redirect": 3
+        }
+      ],
+      "baseToken": [
+        "trigger"
+      ],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": []
+    },
+    {
+      "id": "6W7WGZDd",
+      "subID": 2,
+      "subFlowDescription": "你向牛蛙君投出精灵球",
+      "action": "roll",
+      "actionType": "捕获",
+      "actionValue": 4,
+      "success": "你收服了牛蛙君",
+      "successRedirect": 4,
+      "fail": "精灵球爆开了，收服失败",
+      "failRedirect": 5,
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "6W7WGZDd",
+      "subID": 3,
+      "subFlowDescription": "你无视了牛蛙君，继续自己的旅程",
+      "action": "end",
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "6W7WGZDd",
+      "subID": 4,
+      "subFlowDescription": "牛蛙君成为了你的伙伴",
+      "action": "end",
+      "statusEffect": {
+        "水": 1
+      },
+      "item": [
+        {
+          "backpack": "pm",
+          "action": "add",
+          "name": "牛蛙君"
+        }
+      ],
+      "addToken": [
+        "牛蛙君"
+      ],
+      "baseToken": [],
+      "excludeToken": [],
+      "removeToken": [],
+      "eventEffect": {},
+      "optionList": []
+    },
+    {
+      "id": "6W7WGZDd",
+      "subID": 5,
+      "action": "roll",
+      "actionType": "捕获",
+      "actionValue": 4,
+      "success": "牛蛙君还在原处",
+      "successRedirect": 1,
+      "fail": "牛蛙君逃走了",
+      "failRedirect": 6,
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "6W7WGZDd",
+      "subID": 6,
+      "subFlowDescription": "你只能继续前行",
+      "action": "end",
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "uUDk768v",
+      "name": "胡说树",
+      "description": "路口有一颗奇怪的树阻挡了你的去路",
+      "onetime": false,
+      "rare": 1,
+      "icon": "bga.webp",
+      "subID": 1,
+      "action": "check",
+      "actionType": "backpack['背包']",
+      "actionValue": "_.include(a, '杰尼龟喷壶')",
+      "success": "你用喷壶给奇怪的树浇了水，树活动了起来",
+      "successRedirect": 6,
+      "fail": "你摸了奇怪的树的树干，树好像扭动了一下",
+      "failRedirect": 7,
+      "baseToken": [
+        "trigger"
+      ],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "uUDk768v",
+      "subID": 2,
+      "subFlowDescription": "你向胡说树投出精灵球",
+      "action": "roll",
+      "actionType": "捕获",
+      "actionValue": 4,
+      "success": "你收服了胡说树",
+      "successRedirect": 4,
+      "fail": "精灵球爆开了，收服失败",
+      "failRedirect": 5,
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "uUDk768v",
+      "subID": 3,
+      "subFlowDescription": "你无视了胡说树，胡说树逃走了",
+      "action": "end",
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "uUDk768v",
+      "subID": 4,
+      "subFlowDescription": "胡说树成为了你的伙伴",
+      "action": "end",
+      "statusEffect": {
+        "岩": 1
+      },
+      "item": [
+        {
+          "backpack": "pm",
+          "action": "add",
+          "name": "胡说树"
+        }
+      ],
+      "addToken": [
+        "胡说树"
+      ],
+      "baseToken": [],
+      "excludeToken": [],
+      "removeToken": [],
+      "eventEffect": {},
+      "optionList": []
+    },
+    {
+      "id": "uUDk768v",
+      "subID": 5,
+      "action": "roll",
+      "actionType": "捕获",
+      "actionValue": 1,
+      "success": "胡说树还在原处",
+      "successRedirect": 1,
+      "fail": "胡说树逃走了",
+      "failRedirect": 8,
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "subID": 6,
+      "subFlowDescription": "你选择",
+      "action": "choose",
+      "optionList": [
+        {
+          "label": "投出精灵球",
+          "redirect": 2
+        },
+        {
+          "label": "什么也不做",
+          "redirect": 3
+        }
+      ],
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": []
+    },
+    {
+      "subID": 7,
+      "subFlowDescription": "树阻挡了你的去路，你只能另寻别路",
+      "action": "end",
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "subID": 8,
+      "subFlowDescription": "你只能继续前行",
+      "action": "end",
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    }
+  ]
+}
