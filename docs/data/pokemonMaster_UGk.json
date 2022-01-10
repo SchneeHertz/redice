@@ -1,5 +1,5 @@
 {
-  "id": "xffsZ0g7S0uZsk6OSnKpf",
+  "id": "2DmLlJICLrfmEkYTUiUUm",
   "name": "目标! 宝可梦大师",
   "description": "来自真新镇的你，踏上了成为宝可梦大师的旅程",
   "status": {
@@ -52,13 +52,13 @@
           "icon": "ygie.webp",
           "x": "2",
           "y": "2",
-          "id": "_uYdOyOu"
+          "id": "pDzOxVRa"
         },
         {
           "icon": "ygoz.webp",
           "x": "3",
           "y": "2",
-          "id": "2zP5wRpC"
+          "id": "O2rAdiFr"
         }
       ],
       "eventEffect": {
@@ -84,25 +84,25 @@
           "icon": "ygoo.webp",
           "x": "2",
           "y": "2",
-          "id": "BhMYrWCo"
+          "id": "PcvqyOYk"
         },
         {
           "icon": "rbgs.webp",
           "x": "3",
           "y": "2",
-          "id": "qJEOTvVz"
+          "id": "Pp35qRFM"
         },
         {
           "icon": "sgr.webp",
           "x": "2",
           "y": "3",
-          "id": "pSGrR5kx"
+          "id": "Ee_4sLE-"
         },
         {
           "icon": "ygd.webp",
           "x": "3",
           "y": "3",
-          "id": "Aew3-WGs"
+          "id": "6OP5fGtE"
         }
       ],
       "item": [
@@ -129,19 +129,19 @@
           "icon": "rbgps.webp",
           "x": "2",
           "y": "1",
-          "id": "014S-Vvn"
+          "id": "FrittMWC"
         },
         {
           "icon": "ygf.webp",
           "x": "2",
           "y": "2",
-          "id": "xvesKqKb"
+          "id": "8pB2mXHU"
         },
         {
           "icon": "ygg.webp",
           "x": "2",
           "y": "3",
-          "id": "8AU-3oiK"
+          "id": "kEirA4nc"
         }
       ],
       "eventEffect": {
@@ -166,18 +166,10 @@
       "rare": 1,
       "icon": "bga.webp",
       "subID": 1,
-      "subFlowDescription": "你选择",
-      "action": "choose",
-      "optionList": [
-        {
-          "label": "投出精灵球",
-          "redirect": 2
-        },
-        {
-          "label": "什么也不做",
-          "redirect": 3
-        }
-      ],
+      "action": "display",
+      "actionType": "image",
+      "actionValue": "https://media.52poke.com/wiki/thumb/a/a4/186Politoed.png/240px-186Politoed.png",
+      "successRedirect": 7,
       "baseToken": [
         "trigger"
       ],
@@ -186,7 +178,8 @@
       "removeToken": [],
       "statusEffect": {},
       "eventEffect": {},
-      "item": []
+      "item": [],
+      "optionList": []
     },
     {
       "id": "6W7WGZDd",
@@ -278,6 +271,28 @@
       "eventEffect": {},
       "item": [],
       "optionList": []
+    },
+    {
+      "subID": 7,
+      "subFlowDescription": "你选择",
+      "action": "choose",
+      "optionList": [
+        {
+          "label": "投出精灵球",
+          "redirect": 2
+        },
+        {
+          "label": "什么也不做",
+          "redirect": 3
+        }
+      ],
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": []
     },
     {
       "id": "uUDk768v",
@@ -383,6 +398,7 @@
       "optionList": []
     },
     {
+      "id": "uUDk768v",
       "subID": 6,
       "subFlowDescription": "你选择",
       "action": "choose",
@@ -405,6 +421,7 @@
       "item": []
     },
     {
+      "id": "uUDk768v",
       "subID": 7,
       "subFlowDescription": "树阻挡了你的去路，你只能另寻别路",
       "action": "end",
@@ -418,9 +435,22 @@
       "optionList": []
     },
     {
+      "id": "uUDk768v",
       "subID": 8,
       "subFlowDescription": "你只能继续前行",
       "action": "end",
+      "baseToken": [],
+      "excludeToken": [],
+      "addToken": [],
+      "removeToken": [],
+      "statusEffect": {},
+      "eventEffect": {},
+      "item": [],
+      "optionList": []
+    },
+    {
+      "id": "L758AP8P",
+      "name": "草钢",
       "baseToken": [],
       "excludeToken": [],
       "addToken": [],
